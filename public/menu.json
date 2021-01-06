@@ -1,0 +1,56 @@
+{
+  "menuItems": [
+    {
+      "key": "home",
+      "type": "upload",
+      "title": "主页",
+      "path": "/home"
+    },
+    {
+      "key": "fuye",
+      "type": "upload",
+      "title": "附页",
+      "path": "/fuye"
+    }
+  ],
+  "subItems": [
+    {
+      "title": "二级菜单1",
+      "key": "21",
+      "type": "upload",
+      "children": [
+        {
+          "key": "biaoge",
+          "type": "upload",
+          "title": "表格",
+          "path": "/biaoge"
+        },
+        {
+          "key": "ckxs",
+          "type": "upload",
+          "title": "查看消息",
+          "path": "/ckxs"
+        }
+      ]
+    },
+    {
+      "title": "二级菜单2",
+      "key": "22",
+      "type": "upload",
+      "children": [
+        {
+          "key": "pass",
+          "type": "upload",
+          "title": "修改密码",
+          "path": "/pass"
+        },
+        {
+          "key": "userInfo",
+          "type": "upload",
+          "title": "基本资料",
+          "path": "/userInfo"
+        }
+      ]
+    }
+  ]
+}
