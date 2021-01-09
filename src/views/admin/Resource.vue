@@ -49,7 +49,7 @@
         <a-popconfirm
           @cancel="cancel"
           @confirm="confirm(record.id)"
-          cancel-text="取消"
+          cancel-text="取ss消"
           ok-text="确认"
           title="确定要删除吗?"
         >
