@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <a-locale-provider :locale="zhCN">
+    <a-config-provider :locale="zhCN">
       <router-view v-wechat-title='$route.meta.title'></router-view>
-    </a-locale-provider>
+    </a-config-provider>
   </div>
 </template>
 <script>
