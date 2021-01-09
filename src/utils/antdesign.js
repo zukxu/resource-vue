@@ -9,7 +9,9 @@ import {
   Input,
   Layout,
   List,
+  LocaleProvider,
   Menu,
+  Modal,
   Pagination,
   Popconfirm,
   Row,
@@ -17,11 +19,9 @@ import {
   Table,
   Tag,
   Tooltip,
-  Modal,
-  LocaleProvider,
-
+  Upload
 } from 'ant-design-vue'
 import Vue from 'vue'
 
-Vue.use(Button).use(Layout).use(Menu).use(Icon).use(Select).use(Row).use(Col).use(Form).use(FormModel).use(Input).use(Table).use(Tag).use(Divider).use(Pagination).use(Tooltip).use(Popconfirm).use(List).use(Card).use(Modal).use(LocaleProvider)
+Vue.use(Upload).use(Button).use(Layout).use(Menu).use(Icon).use(Select).use(Row).use(Col).use(Form).use(FormModel).use(Input).use(Table).use(Tag).use(Divider).use(Pagination).use(Tooltip).use(Popconfirm).use(List).use(Card).use(Modal).use(LocaleProvider)
 

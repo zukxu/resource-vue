@@ -7,23 +7,22 @@
         </a-card>
       </a-list-item>
     </a-list>
-    <a-pagination
-      :page-size="page.size"
-      :show-total="total => `共 ${total} 条数据`"
-      :total="page.total"
-      @change="pageCurrentChange"
-      @showSizeChange="pageSizeChange"
-      show-size-changer
-      v-model="page.current"
-    >
-      <template slot="buildOptionText" slot-scope="props">
-        <span v-if="props.value !== '100'">{{ props.value }}条/页</span>
-      </template>
-    </a-pagination>
+    <div class="pagination-local">
+      <a-pagination
+        :page-size="page.size"
+        :show-total="(total, range) => `${range[0]}-${range[1]} of ${total} 数据`"
+        :total="page.total"
+        @change="pageCurrentChange"
+        @showSizeChange="pageSizeChange"
+        show-size-changer
+        v-model="page.current"
+      >
+      </a-pagination>
+    </div>
   </div>
 </template>
 <script>
-import {listInfo} from '@/service/resource'
+import {listRes} from '@/service/resource'
 
 export default {
   data() {
@@ -44,17 +43,21 @@ export default {
   },
   methods: {
     listInfo() {
-
       this.loading = true
-      listInfo(this.page).then((res) => {
-        console.log(res.data)
-        if (res.data.code === 200) {
-          this.page.total = res.data.data.total
-          this.dataList = res.data.data.records
+      console.log(this.page)
+      listRes(this.page).then((res) => {
+          console.log(res)
+          if (res.data.code !== 1) {
+            this.$message.error('请求异常')
+            return
+          }
+          const data = res.data.data
+          this.page.total = data.total
+          this.dataList = data.records
           this.loading = false
-          console.log(res.data.data.total)
+          console.log(data.total)
         }
-      })
+      )
     },
     pageSizeChange(current, pageSize) {
       console.log(current, pageSize)
@@ -72,6 +75,11 @@ export default {
 </script>
 <style lang="less" scoped>
 #Home{
+  padding: 20px;
 
+  .pagination-local{
+    left: 25%;
+    top: 35px;
+  }
 }
 </style>

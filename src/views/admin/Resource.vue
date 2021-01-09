@@ -183,14 +183,18 @@ export default {
     listInfo() {
       this.loading = true
       listRes(this.page).then((res) => {
-        console.log(res.data)
-        if (res.data.code === 200) {
-          this.page.total = res.data.data.total
-          this.dataList = res.data.data.records
+          console.log(res.data)
+          if (res.data.code !== 1) {
+            this.$message.error('请求异常')
+            return
+          }
+          const data=res.data.data
+          this.page.total = data.total
+          this.dataList = data.records
           this.loading = false
-          console.log(res.data.data.total)
+          console.log(data.total)
         }
-      })
+      )
     },
     typeInfo() {
       listType().then((res) => {
@@ -202,18 +206,21 @@ export default {
           })
         })
       })
-    },
-    //分类查询
+    }
+    ,
+//分类查询
     handleChange(value) {
       console.log(`selected ${value}`)
       this.formData.typeId = value
-    },
+    }
+    ,
     filterOption(input, option) {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
       )
-    },
-    //新窗口打开
+    }
+    ,
+//新窗口打开
     openLink(url) {
       console.log(url)
       //判断是否保函协议头，不包含则添加
@@ -228,24 +235,28 @@ export default {
         console.log(url)
       }
       window.open(url, '_blank')
-    },
-    //删除
+    }
+    ,
+//删除
     del(e) {
       delRes(e).then((res) => {
         console.log(res.data)
         this.$message.success('Success')
         this.listInfo()
       })
-    },
+    }
+    ,
     confirm(e) {
       console.log(e)
       this.del(e)
-    },
+    }
+    ,
     cancel(e) {
       console.log(e)
       this.$message.warn('取消删除！')
-    },
-    //分页查询
+    }
+    ,
+//分页查询
     pageSizeChange(current, pageSize) {
       console.log(current, pageSize)
       this.page.size = pageSize
@@ -256,18 +267,21 @@ export default {
       console.log(current, pageSize)
       this.page.current = current
       this.listInfo()
-    },
-    //  更新
-    //查看详情
+    }
+    ,
+//  更新
+//查看详情
     details(e) {
       console.log(e)
       this.formData = e
       this.tempData = JSON.stringify(e)
       this.showModal()
-    },
+    }
+    ,
     showModal() {
       this.visible = true
-    },
+    }
+    ,
     handleOk() {
       const isOk = this.tempData === JSON.stringify(this.formData)
       console.log(isOk)
@@ -284,30 +298,35 @@ export default {
       } else {
         this.$message.warn('未做任何修改！')
       }
-    },
+    }
+    ,
     handleCancel() {
       this.visible = false
-    },
-    //  搜索
+    }
+    ,
+//  搜索
     searchSelectChange(value) {
       console.log(`selected ${value}`)
       this.searchData.index = value
       this.page.index = this.searchData.index
       this.listInfo()
-    },
+    }
+    ,
     onSearch(value) {
       console.log(value)
       this.searchData.fields = value
       this.page.fields = this.searchData.fields
       this.page.current = 1
       this.listInfo()
-    },
+    }
+    ,
     clearSearch() {
       this.searchData.fields = ''
       this.searchData.index = undefined
       console.log(this.searchData)
       this.listInfo()
-    },
+    }
+    ,
   }
   ,
 }

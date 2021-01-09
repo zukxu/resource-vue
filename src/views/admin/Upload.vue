@@ -1,27 +1,24 @@
 <template>
-  <div class="Upload">
-    <div class="clearfix content">
-      <a-upload
-        :file-list="fileList"
-        @change="handleChange"
-        @preview="handlePreview"
-        accept="image/*"
-        action="https://xiaotuwo.getharbours.com/api/files/upload"
-        list-type="picture-card"
-        name="file"
-      >
-        <a-icon type="plus"/>
-        <div class="ant-upload-text">
-          上传
-        </div>
-      </a-upload>
-      <a-modal :footer="null" :visible="previewVisible" @cancel="handleCancel">
-        <img :src="previewImage" alt="预览" style="width: 100%"/>
-      </a-modal>
-    </div>
+  <div class=" clearfix content" id="Upload">
+    <a-upload
+      :file-list="fileList"
+      @change="handleChange"
+      @preview="handlePreview"
+      accept="image/*"
+      action="/minio/"
+      list-type="picture-card"
+      name="file"
+    >
+      <a-icon type="plus"/>
+      <div class="ant-upload-text">
+        上传
+      </div>
+    </a-upload>
+    <a-modal :footer="null" :visible="previewVisible" @cancel="handleCancel">
+      <img :src="previewImage" alt="预览" style="width: 100%"/>
+    </a-modal>
   </div>
 </template>
-
 <script>
 export default {
   data() {
@@ -56,9 +53,8 @@ export default {
   },
 }
 </script>
-
-<style lang="less" scoped>
-.Upload{
+<style lang="less">
+#Upload{
   .content{
     margin: 30px 100px;
   }
@@ -72,5 +68,6 @@ export default {
     margin-top: 8px;
     color: #666666;
   }
+
 }
 </style>
