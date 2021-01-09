@@ -37,7 +37,7 @@
           <span class="avatar-img">
             <img alt="" src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"/>
           </span>
-          <span>ZUK Xu</span>
+          <span>ZUK XU</span>
         </span>
         </div>
       </a-layout-header>

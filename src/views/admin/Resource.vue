@@ -1,28 +1,54 @@
 <template>
-  <div class="Resource">
-    <a-row>
-      <a-col span="6">
-        <a-select
-          :filter-option="filterOption"
-          @change="searchSelectChange"
-          allowClear
-          option-filter-prop="children"
-          placeholder="请选择分类"
-          show-search
-          style="width:180px"
-        >
-          <a-select-option :key="d.value" :value="d.value" v-for="d in typeList">{{d.text}}</a-select-option>
-        </a-select>
-      </a-col>
-      <a-col span="12">
-        <a-input-search
-          @search="onSearch"
-          allow-clear
-          enter-button="搜索"
-          placeholder="输入资源名称"
-        />
-      </a-col>
-    </a-row>
+  <div id="Resource">
+    <a-card>
+      <template slot="title">
+       <span>
+        <a-icon type="search"/>筛选/搜索
+       </span>
+        <div class="filterSearchBtn">
+          <a-button>重置</a-button>
+          <a-divider type="vertical"></a-divider>
+          <a-button type="primary">查询结果</a-button>
+        </div>
+      </template>
+      <a-form-model :model="searchData" label-col="span:4" wrapper-col="span:14">
+        <a-form-model-item label="输入搜索：">
+          <a-input-search
+            @search="onSearch"
+            allow-clear
+            enter-button="搜索"
+            placeholder="输入资源名称"
+          />
+        </a-form-model-item>
+        <a-form-model-item label="资源分类：">
+          <a-select
+            :filter-option="filterOption"
+            @change="searchSelectChange"
+            allowClear
+            option-filter-prop="children"
+            placeholder="请选择分类"
+            show-search
+            style="width:180px"
+          >
+            <a-select-option :key="d.value" :value="d.value" v-for="d in typeList">{{d.text}}</a-select-option>
+          </a-select>
+        </a-form-model-item>
+      </a-form-model>
+      <a-row>
+        <a-col span="6">
+          分类搜索：
+
+        </a-col>
+        <a-col span="12">
+
+        </a-col>
+      </a-row>
+    </a-card>
+    <a-card :bordered="false" style="width: 300px">
+      <p>Card content</p>
+      <p>Card content</p>
+      <p>Card content</p>
+    </a-card>
 
     <a-table :columns="columns" :data-source="dataList" :loading="loading" :pagination="false"
              :rowKey="record=>record.id" :scroll="{ x: 1500, y: 480 }">
@@ -169,7 +195,7 @@ export default {
         total: 100
       },
       searchData: {
-        index: undefined,
+        index: '',
         fields: ''
       },
       dataList: [],
@@ -188,7 +214,7 @@ export default {
             this.$message.error('请求异常')
             return
           }
-          const data=res.data.data
+          const data = res.data.data
           this.page.total = data.total
           this.dataList = data.records
           this.loading = false
@@ -333,7 +359,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.Resource{
-
+#Resource{
+  .filterSearchBtn{
+    float: right;
+  }
 }
 </style>
