@@ -156,15 +156,13 @@ const columns = [
     title: '资源名称',
     dataIndex: 'name',
     width: 180,
-    //align: 'center',
     scopedSlots: {customRender: 'names'}
   },
   {
     title: '资源内容',
     dataIndex: 'content',
     ellipsis: true,
-    width: 240,
-    //align: 'center',
+    width: '40%',
     scopedSlots: {customRender: 'links'}
   },
   {
@@ -188,7 +186,6 @@ const columns = [
   {
     title: '操作',
     key: 'action',
-    //fixed: 'right',
     width: 180,
     scopedSlots: {customRender: 'action'},
   },
@@ -359,6 +356,7 @@ export default {
     batchChange(value) {
       console.log(`selected ${value}`)
     },
+
     //  搜索分类
     searchTypeChange(value) {
       console.log(`selected ${value}`)
