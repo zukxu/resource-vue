@@ -6,9 +6,10 @@
         筛选/搜索
       </template>
       <template slot="extra">
-        <a-button @click="clearSearch">重置</a-button>
-        <a-divider type="vertical"></a-divider>
-        <a-button @click="onSearch" type="primary">查询结果</a-button>
+        <a-space>
+          <a-button @click="clearSearch">重置</a-button>
+          <a-button @click="onSearch" type="primary">查询结果</a-button>
+        </a-space>
       </template>
       <div class="search-form-body">
         <a-form :model="page" layout="inline">
@@ -34,19 +35,50 @@
         </a-form>
       </div>
     </a-card>
-    <a-card :bordered="false" class="card-resource-list">
-      <template slot="title">
-        <a-icon type="profile"/>
-        数据列表
-      </template>
-      <template slot="extra">
-        <a-button @click="add" type="primary">添加</a-button>
-      </template>
-    </a-card>
     <a-table :columns="columns" :data-source="dataList" :loading="loading" :pagination="false"
              :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" :rowKey="record=>record.id"
-             :scroll="{ x: 1500, y: 480 }"
+             :scroll="{ x: 960, y: 480 }"
+             bordered
+             style="margin-top:10px;"
     >
+      <template slot="title">
+        <a-icon type="profile"/>
+        资源列表
+        <a-button @click="add" style="float: right" type="primary">添加</a-button>
+      </template>
+      <template slot="footer">
+        <a-row justify="space-around" type="flex">
+          <a-col span="6">
+            <a-space>
+              <a-select
+                :filter-option="filterOption"
+                @change="batchChange"
+                allowClear
+                option-filter-prop="children"
+                placeholder="批量操作"
+                show-search
+                style="width:200px"
+              >
+                <a-select-option :key="d.value" :value="d.value" v-for="d in batchList">{{d.text}}</a-select-option>
+              </a-select>
+              <a-button type="primary">确认</a-button>
+            </a-space>
+          </a-col>
+          <a-col span="12">
+            <a-pagination
+              :page-size="page.size"
+              :show-total="total => `共 ${total} 条`"
+              :total="page.total"
+              @change="pageCurrentChange"
+              @showSizeChange="pageSizeChange"
+              show-size-changer
+              size="small"
+              v-model="page.current"
+            >
+            </a-pagination>
+          </a-col>
+        </a-row>
+      </template>
       <span slot="names" slot-scope="text">
         <a-tag color="#f50">
           {{text.indexOf('（')!==-1?text.substr(0,text.indexOf('（')):text}}</a-tag>
@@ -65,8 +97,8 @@
         </a-tooltip>
       </span>
       <span slot="action" slot-scope="record">
-      <a-button @click="details(record)">详情</a-button>
-         <a-divider type="vertical"/>
+        <a-space>
+      <a-button @click="details(record)">编辑</a-button>
         <a-popconfirm
           @cancel="cancel"
           @confirm="confirm(record.id)"
@@ -74,20 +106,12 @@
           ok-text="确认"
           title="确定要删除吗?"
         >
-      <a-button type="danger">删除</a-button>
-  </a-popconfirm>
+          <a-button type="danger">删除</a-button>
+        </a-popconfirm>
+      </a-space>
     </span>
     </a-table>
-    <a-pagination
-      :page-size="page.size"
-      :show-total="total => `共 ${total} 条数据`"
-      :total="page.total"
-      @change="pageCurrentChange"
-      @showSizeChange="pageSizeChange"
-      show-size-changer
-      v-model="page.current"
-    >
-    </a-pagination>
+
     <a-modal
       :confirm-loading="confirmLoading"
       :visible="visible"
@@ -132,15 +156,15 @@ const columns = [
     title: '资源名称',
     dataIndex: 'name',
     width: 180,
-    align: 'center',
+    //align: 'center',
     scopedSlots: {customRender: 'names'}
   },
   {
     title: '资源内容',
     dataIndex: 'content',
     ellipsis: true,
-    width: 180,
-    align: 'center',
+    width: 240,
+    //align: 'center',
     scopedSlots: {customRender: 'links'}
   },
   {
@@ -164,7 +188,7 @@ const columns = [
   {
     title: '操作',
     key: 'action',
-    fixed: 'right',
+    //fixed: 'right',
     width: 180,
     scopedSlots: {customRender: 'action'},
   },
@@ -193,7 +217,16 @@ export default {
       dataList: [],
       typeList: [],
       formData: {},
-      tempData: {}
+      tempData: {},
+      batchList: [
+        {
+          value: 'batchDel',
+          text: '批量删除',
+        }, {
+          value: 'batchAffair',
+          text: '批量审核',
+        }
+      ]//批量操作
     }
   },
   methods: {
@@ -321,6 +354,10 @@ export default {
     },
     add() {
       console.log('')
+    },
+    //批量操作
+    batchChange(value) {
+      console.log(`selected ${value}`)
     },
     //  搜索分类
     searchTypeChange(value) {
