@@ -23,15 +23,15 @@ const routes = [
     children: [{
       path: '/addResource',
       name: 'addResource',
-      component: () => import('@/views/admin/AddResource')
+      component: () => import('@/views/admin/resources/component/AddResource')
     }, {
       path: '/resource',
       name: 'resource',
-      component: () => import('@/views/admin/Resource')
+      component: () => import('@/views/admin/resources/Resource')
     },{
       path: '/upload',
       name: 'upload',
-      component: () => import('@/views/admin/Upload')
+      component: () => import('@/views/admin/upload/Upload')
     },
     ]
   }, {
