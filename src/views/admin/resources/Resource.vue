@@ -44,7 +44,7 @@
       <template slot="title">
         <a-icon type="profile"/>
         资源列表
-        <a-button @click="add" style="float: right" type="primary">添加</a-button>
+        <a-button @click="addNew" style="float: right" type="primary">添加</a-button>
       </template>
       <template slot="footer">
         <a-row justify="space-around" type="flex">
@@ -98,7 +98,7 @@
       </span>
       <span slot="action" slot-scope="record">
         <a-space>
-      <a-button @click="details(record)">编辑</a-button>
+      <a-button @click="update(record)">编辑</a-button>
         <a-popconfirm
           @cancel="cancel"
           @confirm="confirm(record.id)"
@@ -111,45 +111,16 @@
       </a-space>
     </span>
     </a-table>
-
-    <a-modal
-      :confirm-loading="confirmLoading"
-      :visible="visible"
-      @cancel="handleCancel"
-      @ok="handleOk"
-      title="编辑"
-    >
-      <a-form-model :model="formData">
-        <a-form-model-item label="资源名称">
-          <a-input v-model="formData.name"/>
-        </a-form-model-item>
-        <a-form-model-item label="资源分类">
-          <a-select
-            :filter-option="filterOption"
-            :value="formData.typeId"
-            @change="handleChange"
-            option-filter-prop="children"
-            placeholder="请选择分类"
-            show-search
-          >
-            <a-select-option :key="d.value" :value="d.value" v-for="d in typeList">{{d.text}}</a-select-option>
-          </a-select>
-        </a-form-model-item>
-        <a-form-model-item label="资源地址">
-          <a-input type="textarea" v-model="formData.content"/>
-        </a-form-model-item>
-        <a-form-model-item label="资源描述">
-          <a-input type="textarea" v-model="formData.remark"/>
-        </a-form-model-item>
-      </a-form-model>
-    </a-modal>
+    <AddResource :resource="tempData" @addCancelEvent="addCancelEvent" @addConfirmEvent="addConfirmEvent"
+                 v-if="visible"></AddResource>
   </div>
 </template>
 
 <script>
 
-import {delRes, listRes, updRes} from '@/service/resource'
+import {addRes, delRes, listRes, updRes} from '@/service/resource'
 import {listType} from '@/service/type'
+import {AddResource} from '@/views/admin/resources/component/AddResource'
 
 const columns = [
   {
@@ -192,18 +163,19 @@ const columns = [
 ]
 export default {
   name: 'Resource',
-  components: {},
+  components: {AddResource},
   created() {
     this.listInfo()
     this.typeInfo()
   },
   data() {
     return {
-      columns,
-      selectedRowKeys: [],
-      loading: false,
-      visible: false,
+      columns,//表格行配置
+      selectedRowKeys: [],//选中行
+      loading: false,//加载
+      visible: false,//显示
       confirmLoading: false,
+      //查询参数
       page: {
         current: 1,
         size: 10,
@@ -214,7 +186,9 @@ export default {
       dataList: [],
       typeList: [],
       formData: {},
+      //组件传递参数
       tempData: {},
+      //批量操作
       batchList: [
         {
           value: 'batchDel',
@@ -223,7 +197,7 @@ export default {
           value: 'batchAffair',
           text: '批量审核',
         }
-      ]//批量操作
+      ]
     }
   },
   methods: {
@@ -260,10 +234,12 @@ export default {
         this.$message.error('查询信息失败：' + e)
       })
     },
+
     handleChange(value) {
       console.log(`selected ${value}`)
       this.formData.typeId = value
     },
+    //选中数据行
     onSelectChange(selectedRowKeys) {
       console.log('selectedRowKeys changed: ', selectedRowKeys)
       this.selectedRowKeys = selectedRowKeys
@@ -274,7 +250,7 @@ export default {
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
       )
     },
-    //新窗口打开
+    //新窗口打开链接
     openLink(url) {
       console.log(url)
       //判断是否包含协议头，不包含则添加
@@ -290,7 +266,7 @@ export default {
       }
       window.open(url, '_blank')
     },
-    //删除
+    //行删除操作
     del(e) {
       delRes(e).then((res) => {
         console.log(res.data)
@@ -298,6 +274,7 @@ export default {
         this.listInfo()
       })
     },
+
     confirm(e) {
       console.log(e)
       this.del(e)
@@ -306,7 +283,7 @@ export default {
       console.log(e)
       this.$message.warn('取消删除！')
     },
-    //分页查询
+    //页数切换，每页显示多少条数据
     pageSizeChange(current, pageSize) {
       console.log(current, pageSize)
       this.page.size = pageSize
@@ -318,52 +295,49 @@ export default {
       this.page.current = current
       this.listInfo()
     },
+    //组件操作
+    //添加
+    addNew() {
+      this.tempData = {}
+      this.switchModal()
+    },
     //  更新
-    //查看详情
-    details(e) {
+    update(e) {
+      e.isUpd = true
       console.log(e)
-      this.formData = e
       this.tempData = JSON.stringify(e)
       this.showModal()
     },
-    showModal() {
-      this.visible = true
+    //切换组件显示
+    switchModal() {
+      this.visible = !this.visible
     },
     handleOk() {
       const isOk = this.tempData === JSON.stringify(this.formData)
       console.log(isOk)
       if (!isOk) {
         this.confirmLoading = true
-        updRes(this.formData).then((res) => {
-          console.log(res.data)
-          if (res.data.code === 200) {
-            this.visible = false
-            this.confirmLoading = false
-            this.$message.success('添加成功')
-          }
-        })
+
       } else {
         this.$message.warn('未做任何修改！')
       }
     },
     handleCancel() {
-      this.visible = false
+      this.visible = !this.visible
     },
-    add() {
-      console.log('')
-    },
+
     //批量操作
     batchChange(value) {
       console.log(`selected ${value}`)
     },
-
-    //  搜索分类
+    //  搜索分类切换
     searchTypeChange(value) {
       console.log(`selected ${value}`)
       this.page.index = value
       console.log(this.page)
       //this.listInfo()
     },
+    //搜索
     onSearch() {
       this.listInfo()
     },
@@ -373,6 +347,40 @@ export default {
         this.page.index = undefined
         this.listInfo()
       }
+    },
+    //  子组件取消事件
+    addCancelEvent() {
+      console.log('子组件取消事件')
+    },
+    //  子组件确认事件
+    addConfirmEvent(val) {
+      if (val.isUpd === true) {
+        addRes(val).then((res) => {
+          console.log(res.data)
+          if (res.data.code === 200) {
+            this.form = {
+              name: '',
+              typeId: undefined,
+              content: '',
+            }
+            this.$message.success('Success')
+          } else {
+            this.$message.error('Fail')
+          }
+        })
+        return
+      }
+      updRes(this.formData).then((res) => {
+        console.log(res.data)
+        if (res.data.code === 1) {
+          this.visible = false
+          this.confirmLoading = false
+          this.$message.success('修改成功')
+        }
+      }).catch(e => {
+        this.confirmLoading = false
+        this.$message.error('修改失败' + e)
+      })
     },
   },
 }

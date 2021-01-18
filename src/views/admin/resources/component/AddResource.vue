@@ -1,13 +1,13 @@
 <template>
-  <div class="AddResource">
-    <a-form-model :label-col="labelCol" :model="form" :wrapper-col="wrapperCol">
-      <a-form-model-item label="资源名称">
-        <a-input v-model="form.name"/>
+  <div id="AddResource">
+    <a-form-model :label-col="labelCol" :model="tempForm" :rules="rules" :wrapper-col="wrapperCol" ref="childForm">
+      <a-form-model-item label="资源名称" prop="name">
+        <a-input v-model="tempForm.name"/>
       </a-form-model-item>
       <a-form-model-item label="资源分类">
         <a-select
           :filter-option="filterOption"
-          :value="form.typeId"
+          :value="tempForm.typeId"
           @change="handleChange"
           option-filter-prop="children"
           placeholder="请选择分类"
@@ -16,92 +16,88 @@
           <a-select-option :key="d.value" :value="d.value" v-for="d in typeList">{{d.text}}</a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="资源地址">
-        <a-input type="textarea" v-model="form.content"/>
+      <a-form-model-item label="资源地址" prop="content">
+        <a-input type="textarea" v-model="tempForm.content"/>
       </a-form-model-item>
       <a-form-model-item label="资源描述">
-        <a-input type="textarea" v-model="form.remark"/>
+        <a-input type="textarea" v-model="tempForm.remark"/>
       </a-form-model-item>
       <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
-        <a-button @click="onSubmit" type="primary">
-          添加
-        </a-button>
-        <a-button style="margin-left: 10px;">
-          取消
-        </a-button>
+        <a-space>
+          <a-button @click="confirm" type="primary">
+            确认
+          </a-button>
+          <a-button @click="()=>{this.$emit('addCancelEvent')}">
+            取消
+          </a-button>
+        </a-space>
       </a-form-model-item>
     </a-form-model>
   </div>
 </template>
 
 <script>
-import {addRes} from '@/service/resource'
-import {listType} from '@/service/type'
 
 export default {
-  name: 'Resource',
-  props: {},
-  components: {},
+  name: 'AddResource',
+  props: {
+    resource: {
+      type: Object,
+      default: () => ({})
+    },
+    typeList: {
+      type: Array,
+      default: () => []
+    }
+  },
   created() {
-    this.typeInfo()
+    //this.typeInfo()
+    if (this.resource.isUpd !== undefined) {
+      this.tempForm = this.resource
+    }
   },
   data() {
     return {
       labelCol: {span: 4},
       wrapperCol: {span: 14},
-      form: {
-        name: '',
-        typeId: undefined,
-        content: '',
-        remark: ''
-      },
-      page: {
-        current: 1,
-        size: 10,
-        index: '',
-        fields: '',
-        total: 100
-      },
-      typeList: []
+      tempForm: {},
+      //typeList: [],
+      rules: {
+        name: [
+          {required: true, message: '请输入资源名称', trigger: 'blur'}
+        ],
+        content: [
+          {required: true, message: '请输入资源地址', trigger: 'change'}
+        ],
+      }
     }
   },
   methods: {
-    onSubmit() {
-      console.log('submit!', this.form)
-      if (this.form.name.length < 1 || this.form.content.length < 1) {
-        this.$message.error('请输入正确的内容')
-        return
-      }
-      addRes(this.form).then((res) => {
-        console.log(res.data)
-        if (res.data.code === 200) {
-          this.form = {
-            name: '',
-            typeId: undefined,
-            content: '',
-          }
-          this.$message.success('Success')
-        } else {
-          this.$message.error('Fail')
-        }
-      })
+    //确认
+    confirm() {
+      console.log(this.tempForm)
+      this.tempForm.isUpd = this.resource.isUpd !== undefined
+      this.$emit('addConfirmEvent', this.tempForm)
     },
-    typeInfo() {
-      listType().then((res) => {
-        console.log(res.data)
-        const result = res.data.data.records
-        result.forEach((r) => {
-          this.typeList.push({
-            value: r.id,
-            text: r.typeName
-          })
-        })
-      })
-    },
+    //查询分类
+    /* typeInfo() {
+       listType().then((res) => {
+         console.log(res.data)
+         const result = res.data.data.records
+         result.forEach((r) => {
+           this.typeList.push({
+             value: r.id,
+             text: r.typeName
+           })
+         })
+       })
+     },*/
+    //选择分类
     handleChange(value) {
       console.log(`selected ${value}`)
-      this.form.typeId = value
+      this.tempForm.typeId = value
     },
+    //筛选
     filterOption(input, option) {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -112,7 +108,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.AddResource{
+#AddResource{
 
 }
 </style>

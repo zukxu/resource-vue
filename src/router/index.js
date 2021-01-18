@@ -20,6 +20,14 @@ const routes = [
       title: ' 资源管理系统'   // 标题设置
     },
     children: []
+  },{
+    path: '/demo1',
+    name: 'demo1',
+    component: () => import('@/views/demo/parent'),
+    meta: {
+      title: ' 资源管理系统'   // 标题设置
+    },
+    children: []
   },
   {
     path: '/admin',
