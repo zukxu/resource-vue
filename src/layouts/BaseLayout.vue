@@ -3,12 +3,12 @@
     <a-layout-sider :trigger="null" breakpoint="lg" collapsible v-model="collapsed">
       <div class="logo"/>
       <a-menu :default-selected-keys="[$route.path]" mode="inline" theme="dark">
-        <a-menu-item key="/addResource">
+        <!--<a-menu-item key="/addResource">
           <router-link to="/addResource">
             <a-icon type="video-camera"/>
             <span>添加资源</span>
           </router-link>
-        </a-menu-item>
+        </a-menu-item>-->
         <a-menu-item key="/resource">
           <router-link to="/resource">
             <a-icon type="video-camera"/>

@@ -101,7 +101,7 @@
       <a-button @click="update(record)">编辑</a-button>
         <a-popconfirm
           @cancel="cancel"
-          @confirm="confirm(record.id)"
+          @confirm="confirmDel(record.id)"
           cancel-text="取消"
           ok-text="确认"
           title="确定要删除吗?"
@@ -111,8 +111,13 @@
       </a-space>
     </span>
     </a-table>
-    <AddResource :resource="tempData" @addCancelEvent="addCancelEvent" @addConfirmEvent="addConfirmEvent"
-                 v-if="visible"></AddResource>
+    <AddResource :isShow="isShow"
+                 :resource="tempData"
+                 :title="title"
+                 :typeList="typeList"
+                 @addCancelEvent="addCancelEvent"
+                 @addConfirmEvent="addConfirmEvent">
+    </AddResource>
   </div>
 </template>
 
@@ -120,7 +125,7 @@
 
 import {addRes, delRes, listRes, updRes} from '@/service/resource'
 import {listType} from '@/service/type'
-import {AddResource} from '@/views/admin/resources/component/AddResource'
+import AddResource from '@/views/admin/resources/component/AddResource'
 
 const columns = [
   {
@@ -163,7 +168,9 @@ const columns = [
 ]
 export default {
   name: 'Resource',
-  components: {AddResource},
+  components: {
+    AddResource
+  },
   created() {
     this.listInfo()
     this.typeInfo()
@@ -173,8 +180,8 @@ export default {
       columns,//表格行配置
       selectedRowKeys: [],//选中行
       loading: false,//加载
-      visible: false,//显示
-      confirmLoading: false,
+      isShow: false,//显示
+
       //查询参数
       page: {
         current: 1,
@@ -185,9 +192,10 @@ export default {
       },
       dataList: [],
       typeList: [],
-      formData: {},
       //组件传递参数
       tempData: {},
+      //标题
+      title: '',
       //批量操作
       batchList: [
         {
@@ -214,7 +222,6 @@ export default {
         this.page.total = data.total
         this.dataList = data.records
         this.loading = false
-        console.log(data.total)
       }).catch(e => {
         this.loading = false
         this.$message.error('查询信息失败：' + e)
@@ -234,22 +241,90 @@ export default {
         this.$message.error('查询信息失败：' + e)
       })
     },
-
-    handleChange(value) {
-      console.log(`selected ${value}`)
-      this.formData.typeId = value
-    },
     //选中数据行
-    onSelectChange(selectedRowKeys) {
-      console.log('selectedRowKeys changed: ', selectedRowKeys)
-      this.selectedRowKeys = selectedRowKeys
+    onSelectChange(row) {
+      console.log('选中行: ', row)
+      this.selectedRowKeys = row
     },
-    //分类过滤
-    filterOption(input, option) {
-      return (
-        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      )
+    //删除
+    confirmDel(e) {
+      delRes(e).then((res) => {
+        console.log(res.data)
+        this.$message.success('Success')
+        this.listInfo()
+      }).catch(e => {
+        this.$message.error('fail')
+      })
     },
+
+    cancel(e) {
+      console.log(e)
+      this.$message.warn('取消删除！')
+    },
+    //每页显示多少条数据
+    pageSizeChange(current, pageSize) {
+      console.log(current, pageSize)
+      this.page.size = pageSize
+      this.listInfo()
+    },
+    //分页切换
+    pageCurrentChange(current, pageSize) {
+      console.log(current, pageSize)
+      this.page.current = current
+      this.listInfo()
+    },
+    /****************组件操作**************/
+    //添加
+    addNew() {
+      console.log('添加')
+      this.title = '添加资源'
+      this.tempData = {}
+      this.switchShow()
+    },
+    //更新
+    update(e) {
+      this.title = '更新资源'
+      e.isUpd = true
+      this.tempData = e
+      console.log(this.tempData)
+      this.switchShow()
+    },
+    //切换组件显示
+    switchShow() {
+      this.isShow = !this.isShow
+      console.log(this.isShow)
+    },
+    //  子组件取消事件
+    addCancelEvent() {
+      console.log('子组件取消事件')
+      this.switchShow()
+    },
+    //  子组件确认事件
+    addConfirmEvent(val) {
+      if (val.isUpd === true) {
+        updRes(val).then((res) => {
+          console.log(res.data)
+          if (res.data.code === 1) {
+            this.$message.success('修改成功')
+          }
+        }).catch(e => {
+          this.$message.error('修改失败' + e)
+        })
+      } else {
+        addRes(val).then((res) => {
+          console.log(res.data)
+          if (res.data.code === 1) {
+            this.$message.success('添加成功')
+          } else {
+            this.$message.error(res.message)
+          }
+        })
+      }
+      this.switchShow()
+      console.log(111111111)
+      this.listInfo()
+    },
+    /*******************************************************/
     //新窗口打开链接
     openLink(url) {
       console.log(url)
@@ -266,76 +341,22 @@ export default {
       }
       window.open(url, '_blank')
     },
-    //行删除操作
-    del(e) {
-      delRes(e).then((res) => {
-        console.log(res.data)
-        this.$message.success('Success')
-        this.listInfo()
-      })
-    },
-
-    confirm(e) {
-      console.log(e)
-      this.del(e)
-    },
-    cancel(e) {
-      console.log(e)
-      this.$message.warn('取消删除！')
-    },
-    //页数切换，每页显示多少条数据
-    pageSizeChange(current, pageSize) {
-      console.log(current, pageSize)
-      this.page.size = pageSize
-      this.listInfo()
-    },
-    //分页切换
-    pageCurrentChange(current, pageSize) {
-      console.log(current, pageSize)
-      this.page.current = current
-      this.listInfo()
-    },
-    //组件操作
-    //添加
-    addNew() {
-      this.tempData = {}
-      this.switchModal()
-    },
-    //  更新
-    update(e) {
-      e.isUpd = true
-      console.log(e)
-      this.tempData = JSON.stringify(e)
-      this.showModal()
-    },
-    //切换组件显示
-    switchModal() {
-      this.visible = !this.visible
-    },
-    handleOk() {
-      const isOk = this.tempData === JSON.stringify(this.formData)
-      console.log(isOk)
-      if (!isOk) {
-        this.confirmLoading = true
-
-      } else {
-        this.$message.warn('未做任何修改！')
-      }
-    },
-    handleCancel() {
-      this.visible = !this.visible
-    },
-
     //批量操作
     batchChange(value) {
       console.log(`selected ${value}`)
     },
-    //  搜索分类切换
+    //搜索分类切换
     searchTypeChange(value) {
       console.log(`selected ${value}`)
       this.page.index = value
       console.log(this.page)
       //this.listInfo()
+    },
+    //分类过滤
+    filterOption(input, option) {
+      return (
+        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
     },
     //搜索
     onSearch() {
@@ -347,40 +368,6 @@ export default {
         this.page.index = undefined
         this.listInfo()
       }
-    },
-    //  子组件取消事件
-    addCancelEvent() {
-      console.log('子组件取消事件')
-    },
-    //  子组件确认事件
-    addConfirmEvent(val) {
-      if (val.isUpd === true) {
-        addRes(val).then((res) => {
-          console.log(res.data)
-          if (res.data.code === 200) {
-            this.form = {
-              name: '',
-              typeId: undefined,
-              content: '',
-            }
-            this.$message.success('Success')
-          } else {
-            this.$message.error('Fail')
-          }
-        })
-        return
-      }
-      updRes(this.formData).then((res) => {
-        console.log(res.data)
-        if (res.data.code === 1) {
-          this.visible = false
-          this.confirmLoading = false
-          this.$message.success('修改成功')
-        }
-      }).catch(e => {
-        this.confirmLoading = false
-        this.$message.error('修改失败' + e)
-      })
     },
   },
 }

@@ -20,7 +20,7 @@ const routes = [
       title: ' 资源管理系统'   // 标题设置
     },
     children: []
-  },{
+  }, {
     path: '/demo1',
     name: 'demo1',
     component: () => import('@/views/demo/parent'),
@@ -36,19 +36,22 @@ const routes = [
     meta: {
       title: ' 资源管理系统'   // 标题设置
     },
-    children: [{
-      path: '/addResource',
-      name: 'addResource',
-      component: () => import('@/views/admin/resources/component/AddResource')
-    }, {
-      path: '/resource',
-      name: 'resource',
-      component: () => import('@/views/admin/resources/Resource')
-    },{
-      path: '/upload',
-      name: 'upload',
-      component: () => import('@/views/admin/upload/Upload')
-    },
+    children: [
+      {
+        path: '/resource',
+        name: 'resource',
+        component: () => import('@/views/admin/resources/Resource'),
+        meta: {
+          title: '资源管理系统'
+        }
+      }, {
+        path: '/upload',
+        name: 'upload',
+        component: () => import('@/views/admin/upload/Upload'),
+        meta: {
+          title: '资源管理系统'
+        }
+      },
     ]
   }, {
     path: '*',
