@@ -26,6 +26,13 @@ export function delRes(id) {
   }
   return request(resource.delResource)
 }
+// pl删除
+export function batchDel(ids) {
+  resource.batchDel.params = {
+    ids: ids
+  }
+  return request(resource.batchDel)
+}
 
 // 修改
 export function updRes(entity) {

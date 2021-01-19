@@ -61,7 +61,7 @@
               >
                 <a-select-option :key="d.value" :value="d.value" v-for="d in batchList">{{d.text}}</a-select-option>
               </a-select>
-              <a-button type="primary">确认</a-button>
+              <a-button @click="batchConfirm" type="primary">确认</a-button>
             </a-space>
           </a-col>
           <a-col span="12">
@@ -123,7 +123,7 @@
 
 <script>
 
-import {addRes, delRes, listRes, updRes} from '@/service/resource'
+import {addRes, batchDel, delRes, listRes, updRes} from '@/service/resource'
 import {listType} from '@/service/type'
 import AddResource from '@/views/admin/resources/component/AddResource'
 
@@ -205,7 +205,8 @@ export default {
           value: 'batchAffair',
           text: '批量审核',
         }
-      ]
+      ],
+      batchParam: undefined//批量操作参数
     }
   },
   methods: {
@@ -213,14 +214,13 @@ export default {
     listInfo() {
       this.loading = true
       listRes(this.page).then((res) => {
-        console.log(res.data)
         if (res.data.code !== 1) {
           this.$message.error('数据异常')
           return
         }
-        const data = res.data.data
-        this.page.total = data.total
-        this.dataList = data.records
+        const result = res.data.data
+        this.page.total = result.total
+        this.dataList = result.records
         this.loading = false
       }).catch(e => {
         this.loading = false
@@ -250,13 +250,12 @@ export default {
     confirmDel(e) {
       delRes(e).then((res) => {
         console.log(res.data)
-        this.$message.success('Success')
+        this.$message.success(res.message)
         this.listInfo()
       }).catch(e => {
-        this.$message.error('fail')
+        this.$message.error('删除异常' + e)
       })
     },
-
     cancel(e) {
       console.log(e)
       this.$message.warn('取消删除！')
@@ -340,6 +339,37 @@ export default {
     //批量操作
     batchChange(value) {
       console.log(`selected ${value}`)
+      this.batchParam = value
+    },
+    batchConfirm() {
+      let param = this.batchParam
+      let rowKeys = this.selectedRowKeys
+      let ids = ''
+      this.selectedRowKeys.forEach(function(item) {
+        ids += item + ','
+      })
+      ids = ids.substr(0, ids.length - 1)
+      console.log(ids)
+      if (param !== undefined) {
+        if (rowKeys.length < 1) {
+          this.$message.warn('未选择数据行')
+          return
+        }
+        if (param === 'batchDel') {
+          batchDel(ids).then((res) => {
+            this.$message.success(res.data.message)
+            this.listInfo()
+          }).catch(e => {
+            console.log(e)
+            this.$message.error('批量删除异常' + e)
+          })
+          console.log(11)
+        } else if (param === 'batchAffair') {
+          console.log('batchAffair')
+        } else {
+          console.log(11)
+        }
+      }
     },
     //搜索分类切换
     searchTypeChange(value) {

@@ -28,6 +28,12 @@ const RESOURCE_API = {
     method: 'delete',
     url: '/resource',
     params: ''
+  },
+  //批量删除资源
+  batchDel: {
+    method: 'delete',
+    url: '/resource/batchDel',
+    params: ''
   }
 }
 export default RESOURCE_API
