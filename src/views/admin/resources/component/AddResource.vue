@@ -1,6 +1,7 @@
 <template>
   <div id="AddResource">
     <a-modal
+      :maskClosable="false"
       :title="title"
       :visible="isShow"
       @cancel="cancel"
@@ -60,7 +61,6 @@ export default {
       if (newVal.isUpd !== undefined) {
         this.tempForm = JSON.parse(JSON.stringify(newVal))
       }
-      console.log(this.tempForm)
     }
   },
   data() {
@@ -84,6 +84,11 @@ export default {
     confirm() {
       this.$refs.tempForm.validate(valid => {
         if (valid) {
+          let isEquals = JSON.stringify(this.resource) === JSON.stringify(this.tempForm)
+          if (isEquals) {
+            this.$message.warn('未做任何修改')
+            return
+          }
           this.tempForm.isUpd = this.resource.isUpd !== undefined
           this.$emit('addConfirmEvent', this.tempForm)
           this.resetFrom()
@@ -92,12 +97,14 @@ export default {
           return false
         }
       })
-    },
+    }
+    ,
     //取消
     cancel() {
       this.resetFrom()
       this.$emit('addCancelEvent')
-    },
+    }
+    ,
     //清空表单
     resetFrom() {
       this.tempForm = {
@@ -107,7 +114,8 @@ export default {
         remark: undefined
       }
       this.$refs.tempForm.resetFields()
-    },
+    }
+    ,
     //选择分类
     handleChange(value) {
       console.log(`selected ${value}`)
@@ -120,7 +128,8 @@ export default {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
       )
-    },
+    }
+    ,
   }
   ,
 }

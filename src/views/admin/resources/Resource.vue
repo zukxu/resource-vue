@@ -286,23 +286,20 @@ export default {
       this.title = '更新资源'
       e.isUpd = true
       this.tempData = e
-      console.log(this.tempData)
       this.switchShow()
     },
     //切换组件显示
     switchShow() {
       this.isShow = !this.isShow
-      console.log(this.isShow)
     },
     //  子组件取消事件
     addCancelEvent() {
-      console.log('子组件取消事件')
       this.switchShow()
     },
     //  子组件确认事件
-    addConfirmEvent(val) {
+    async addConfirmEvent(val) {
       if (val.isUpd === true) {
-        updRes(val).then((res) => {
+        await updRes(val).then((res) => {
           console.log(res.data)
           if (res.data.code === 1) {
             this.$message.success('修改成功')
@@ -311,7 +308,7 @@ export default {
           this.$message.error('修改失败' + e)
         })
       } else {
-        addRes(val).then((res) => {
+        await addRes(val).then((res) => {
           console.log(res.data)
           if (res.data.code === 1) {
             this.$message.success('添加成功')
@@ -321,8 +318,7 @@ export default {
         })
       }
       this.switchShow()
-      console.log(111111111)
-      this.listInfo()
+      this.onSearch()
     },
     /*******************************************************/
     //新窗口打开链接
