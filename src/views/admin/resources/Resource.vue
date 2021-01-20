@@ -123,8 +123,10 @@
 
 <script>
 
+import {batchAffair} from '@/service/affair'
 import {addRes, batchDel, delRes, listRes, updRes} from '@/service/resource'
 import {listType} from '@/service/type'
+import request from '@/utils/request'
 import AddResource from '@/views/admin/resources/component/AddResource'
 
 const columns = [
@@ -138,7 +140,6 @@ const columns = [
     title: '资源内容',
     dataIndex: 'content',
     ellipsis: true,
-    width: '40%',
     scopedSlots: {customRender: 'links'}
   },
   {
@@ -322,19 +323,28 @@ export default {
     /*******************************************************/
     //新窗口打开链接
     openLink(url) {
-      console.log(url)
-      //判断是否包含协议头，不包含则添加
-      const p1 = 'http'
-      const p2 = 'https'
-      //indexOf 不存在则返回-1
-      if (url.indexOf(p1) !== -1) {
-        window.open(url, '_blank')
+      let pattern = new RegExp('(http|https|www)')
+      let word = new RegExp('[\u4e00-\u9fa5]')
+      let w = word.test(url)
+      if (w) {
+        this.$message.warn('这不是链接')
         return
-      } else if (url.indexOf(p2) === -1) {
-        url = p2 + '://' + url
-        console.log(url)
       }
-      window.open(url, '_blank')
+      let test = pattern.test(url)
+      const http = 'http://'
+      const https = 'https://'
+      if (test) {
+        window.open(url, '_blank')
+      } else {
+        request({
+          method: 'get',
+          url: http + url,
+        }).then((res) => {
+          window.open(http + url, '_blank')
+        }).catch(e => {
+          window.open(https + url, '_blank')
+        })
+      }
     },
     //批量操作
     batchChange(value) {
@@ -360,12 +370,18 @@ export default {
             this.$message.success(res.data.message)
             this.listInfo()
           }).catch(e => {
-            console.log(e)
             this.$message.error('批量删除异常' + e)
           })
-          console.log(11)
         } else if (param === 'batchAffair') {
-          console.log('batchAffair')
+          const data = {
+            'ids': ids
+          }
+          batchAffair(data).then(res => {
+            this.$message.success(res.data.message)
+            this.listInfo()
+          }).catch(err => {
+            this.$message.error('批量审核异常' + err)
+          })
         } else {
           console.log(11)
         }
@@ -392,6 +408,7 @@ export default {
       if (this.page.fields.length > 0 || this.page.index !== undefined) {
         this.page.fields = ''
         this.page.index = undefined
+        this.selectedRowKeys=[]
         this.listInfo()
       }
     },
