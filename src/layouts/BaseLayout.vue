@@ -1,6 +1,6 @@
 <template>
   <a-layout id="BaseLayout">
-    <a-layout-sider :trigger="null" breakpoint="lg" collapsible v-model="collapsed">
+    <a-layout-sider :trigger="null" breakpoint="md" v-model="collapsed">
       <div class="logo"/>
       <a-menu :default-selected-keys="[$route.path]" mode="inline" theme="dark">
         <!--<a-menu-item key="/addResource">
