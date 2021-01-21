@@ -58,7 +58,7 @@ export default {
   },
   watch: {
     resource: {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         console.log(newVal)
         if (newVal.isUpd !== undefined) {
           this.tempForm = JSON.parse(JSON.stringify(newVal))
@@ -125,7 +125,6 @@ export default {
     handleChange(value) {
       console.log(`selected ${value}`)
       this.tempForm.typeId = value
-      console.log(this.tempForm)
     }
     ,
     //筛选

@@ -234,7 +234,7 @@ export default {
         const result = res.data.data.records
         result.forEach((r) => {
           this.typeList.push({
-            value: r.id,
+            value: String(r.id),
             text: r.typeName
           })
         })
@@ -321,7 +321,7 @@ export default {
     /*******************************************************/
     //新窗口打开链接
     openLink(url) {
-      let pattern = new RegExp('(http|https|www)')
+      let pattern = new RegExp('(http|https)')
       let word = new RegExp('[\u4e00-\u9fa5]')
       let w = word.test(url)
       if (w) {
