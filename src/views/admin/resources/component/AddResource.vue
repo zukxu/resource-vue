@@ -57,11 +57,17 @@ export default {
     }
   },
   watch: {
-    resource(newVal, oldVal) {
-      if (newVal.isUpd !== undefined) {
-        this.tempForm = JSON.parse(JSON.stringify(newVal))
-      }
+    resource: {
+      handler(newVal, oldVal) {
+        console.log(newVal)
+        if (newVal.isUpd !== undefined) {
+          this.tempForm = JSON.parse(JSON.stringify(newVal))
+        }
+      },
+      immediate: true
     }
+  },
+  created() {
   },
   data() {
     return {
@@ -77,8 +83,7 @@ export default {
         ],
       },
     }
-  }
-  ,
+  },
   methods: {
     //确认
     confirm() {
@@ -130,8 +135,7 @@ export default {
       )
     }
     ,
-  }
-  ,
+  },
 }
 </script>
 

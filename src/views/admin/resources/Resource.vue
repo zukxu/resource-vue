@@ -269,14 +269,12 @@ export default {
     },
     //分页切换
     pageCurrentChange(current, pageSize) {
-      console.log(current, pageSize)
       this.page.current = current
       this.listInfo()
     },
     /****************组件操作**************/
     //添加
     addNew() {
-      console.log('添加')
       this.title = '添加资源'
       this.tempData = {}
       this.switchShow()
@@ -408,7 +406,7 @@ export default {
       if (this.page.fields.length > 0 || this.page.index !== undefined) {
         this.page.fields = ''
         this.page.index = undefined
-        this.selectedRowKeys=[]
+        this.selectedRowKeys = []
         this.listInfo()
       }
     },
