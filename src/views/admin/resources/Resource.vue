@@ -115,8 +115,7 @@
                  :resource="tempData"
                  :title="title"
                  :typeList="typeList"
-                 @addCancelEvent="addCancelEvent"
-                 @addConfirmEvent="addConfirmEvent">
+                 @callBackUpdateForm="callBackUpdateForm">
     </AddResource>
   </div>
 </template>
@@ -291,8 +290,12 @@ export default {
       this.isShow = !this.isShow
     },
     //  子组件取消事件
-    addCancelEvent() {
-      this.switchShow()
+    callBackUpdateForm(val) {
+      if (val != null) {
+        this.addConfirmEvent()
+      } else {
+        this.switchShow()
+      }
     },
     //  子组件确认事件
     async addConfirmEvent(val) {

@@ -46,7 +46,7 @@ export default {
     },
     resource: {
       type: Object,
-      default: () => ({})
+      default: null
     },
     title: {
       type: String,
@@ -56,8 +56,17 @@ export default {
       default: () => []
     }
   },
+  onload() {
+    console.log(111111)
+    this.tempForm = this.resource
+    console.log(2222222)
+  },
   watch: {
-    resource: {
+    resource() {
+      this.tempForm = JSON.parse(JSON.stringify(this.resource))
+      console.log('1122:', this.tempForm)
+    }
+   /* resource: {
       handler(newVal) {
         console.log(newVal)
         if (newVal.isUpd !== undefined) {
@@ -65,7 +74,7 @@ export default {
         }
       },
       immediate: true
-    }
+    }*/
   },
   created() {
   },
@@ -95,7 +104,7 @@ export default {
             return
           }
           this.tempForm.isUpd = this.resource.isUpd !== undefined
-          this.$emit('addConfirmEvent', this.tempForm)
+          this.$emit('callBackUpdateForm', this.tempForm)
           this.resetFrom()
         } else {
           console.log('error submit!!')
@@ -106,8 +115,8 @@ export default {
     ,
     //取消
     cancel() {
-      this.resetFrom()
-      this.$emit('addCancelEvent')
+      //this.resetFrom()
+      this.$emit('callBackUpdateForm',null)
     }
     ,
     //清空表单
