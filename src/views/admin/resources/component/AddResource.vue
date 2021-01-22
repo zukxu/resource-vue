@@ -56,27 +56,11 @@ export default {
       default: () => []
     }
   },
-  onload() {
-    console.log(111111)
-    this.tempForm = this.resource
-    console.log(2222222)
-  },
   watch: {
     resource() {
       this.tempForm = JSON.parse(JSON.stringify(this.resource))
       console.log('1122:', this.tempForm)
     }
-   /* resource: {
-      handler(newVal) {
-        console.log(newVal)
-        if (newVal.isUpd !== undefined) {
-          this.tempForm = JSON.parse(JSON.stringify(newVal))
-        }
-      },
-      immediate: true
-    }*/
-  },
-  created() {
   },
   data() {
     return {
@@ -105,22 +89,17 @@ export default {
           }
           this.tempForm.isUpd = this.resource.isUpd !== undefined
           this.$emit('callBackUpdateForm', this.tempForm)
-          this.resetFrom()
-        } else {
-          console.log('error submit!!')
-          return false
         }
       })
     }
     ,
     //取消
     cancel() {
-      //this.resetFrom()
-      this.$emit('callBackUpdateForm',null)
-    }
-    ,
+      this.tempForm = JSON.parse(JSON.stringify(this.resource))
+      this.$emit('callBackUpdateForm', null)
+    },
     //清空表单
-    resetFrom() {
+    resetForm() {
       this.tempForm = {
         name: undefined,
         typeId: undefined,
@@ -132,7 +111,6 @@ export default {
     ,
     //选择分类
     handleChange(value) {
-      console.log(`selected ${value}`)
       this.tempForm.typeId = value
     }
     ,

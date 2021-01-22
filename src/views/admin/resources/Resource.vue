@@ -115,6 +115,7 @@
                  :resource="tempData"
                  :title="title"
                  :typeList="typeList"
+                 ref="addChild"
                  @callBackUpdateForm="callBackUpdateForm">
     </AddResource>
   </div>
@@ -280,6 +281,7 @@ export default {
     },
     //更新
     update(e) {
+      console.log(e.typeId)
       this.title = '更新资源'
       e.isUpd = true
       this.tempData = e
@@ -292,7 +294,7 @@ export default {
     //  子组件取消事件
     callBackUpdateForm(val) {
       if (val != null) {
-        this.addConfirmEvent()
+        this.addConfirmEvent(val)
       } else {
         this.switchShow()
       }
@@ -319,6 +321,7 @@ export default {
         })
       }
       this.switchShow()
+      this.$refs.addChild.resetForm()
       this.onSearch()
     },
     /*******************************************************/
