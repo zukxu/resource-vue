@@ -9,12 +9,12 @@
     >
       <a-form-model :label-col="labelCol" :model="tempForm" :rules="rules" :wrapper-col="wrapperCol" ref="tempForm">
         <a-form-model-item label="资源名称" prop="name">
-          <a-input v-model="tempForm.name"/>
+          <a-input placeholder="请输入资源名称" v-model="tempForm.name"/>
         </a-form-model-item>
         <a-form-model-item label="资源分类">
           <a-select
             :filter-option="filterOption"
-            :value="tempForm.typeId"
+            :value="typeId"
             @change="handleChange"
             option-filter-prop="children"
             placeholder="请选择分类"
@@ -24,10 +24,10 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="资源地址" prop="content">
-          <a-input type="textarea" v-model="tempForm.content"/>
+          <a-input placeholder="请输入资源地址" type="textarea" v-model="tempForm.content"/>
         </a-form-model-item>
         <a-form-model-item label="资源描述">
-          <a-input type="textarea" v-model="tempForm.remark"/>
+          <a-input type="textarea" v-model="tempForm.remark"  placeholder="请输入资源描述"/>
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -59,7 +59,7 @@ export default {
   watch: {
     resource() {
       this.tempForm = JSON.parse(JSON.stringify(this.resource))
-      console.log('1122:', this.tempForm)
+      this.typeId=this.tempForm.typeId
     }
   },
   data() {
@@ -67,6 +67,7 @@ export default {
       labelCol: {span: 4},
       wrapperCol: {span: 14},
       tempForm: {},
+      typeId: undefined,
       rules: {
         name: [
           {required: true, message: '请输入资源名称', trigger: 'blur'}
@@ -96,7 +97,9 @@ export default {
     //取消
     cancel() {
       this.tempForm = JSON.parse(JSON.stringify(this.resource))
+      this.typeId = this.tempForm.typeId
       this.$emit('callBackUpdateForm', null)
+      this.$refs.tempForm.resetFields()
     },
     //清空表单
     resetForm() {
@@ -111,7 +114,8 @@ export default {
     ,
     //选择分类
     handleChange(value) {
-      this.tempForm.typeId = value
+      this.typeId = value
+      this.tempForm.typeId = this.typeId
     }
     ,
     //筛选

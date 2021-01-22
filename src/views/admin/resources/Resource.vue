@@ -133,7 +133,7 @@ const columns = [
   {
     title: '资源名称',
     dataIndex: 'name',
-    width: 180,
+    width: 150,
     scopedSlots: {customRender: 'names'}
   },
   {
