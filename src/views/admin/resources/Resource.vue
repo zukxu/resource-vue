@@ -363,7 +363,6 @@ export default {
         ids += item + ','
       })
       ids = ids.substr(0, ids.length - 1)
-      console.log(ids)
       if (param !== undefined) {
         if (rowKeys.length < 1) {
           this.$message.warn('未选择数据行')
@@ -381,6 +380,8 @@ export default {
             'ids': ids
           }
           batchAffair(data).then(res => {
+            console.log(res.data)
+
             this.$message.success(res.data.message)
             this.listInfo()
           }).catch(err => {

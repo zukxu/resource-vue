@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const instance = axios.create({
   baseURL: 'http://localhost:8099',
-  timeout: 5000
+  timeout: 6000
 })
 axios.interceptors.request.use(config => {
   //在发送请求之前做些什么

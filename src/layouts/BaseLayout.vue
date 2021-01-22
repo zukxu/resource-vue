@@ -41,7 +41,7 @@
       </a-menu>
     </a-layout-sider>
     <a-layout>
-      <a-layout-header style="background: #ffffff; padding: 0">
+      <a-layout-header  :style="{background: '#ffffff', padding:0 }" >
         <span class="global-header-trigger">
         <a-icon
           :type="collapsed ? 'menu-unfold' : 'menu-fold'"
