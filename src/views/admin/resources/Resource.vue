@@ -115,8 +115,8 @@
                  :resource="tempData"
                  :title="title"
                  :typeList="typeList"
-                 ref="addChild"
-                 @callBackUpdateForm="callBackUpdateForm">
+                 @callBackUpdateForm="callBackUpdateForm"
+                 ref="addChild">
     </AddResource>
   </div>
 </template>
@@ -381,7 +381,9 @@ export default {
           }
           batchAffair(data).then(res => {
             console.log(res.data)
-
+            if (res.data.code === 1) {
+              this.selectedRowKeys = []
+            }
             this.$message.success(res.data.message)
             this.listInfo()
           }).catch(err => {
