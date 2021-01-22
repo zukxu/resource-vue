@@ -1,12 +1,18 @@
 <template>
-  <div class="404">
-404
+  <div id="notFound">
+    <a-result status="404" sub-title="Sorry, the page you visited does not exist." title="404">
+      <template #extra>
+        <a-button @click="goHome" type="primary">
+          返回首页
+        </a-button>
+      </template>
+    </a-result>
   </div>
 </template>
 
 <script>
 export default {
-  name: '404',
+  name: 'notFound',
   props: {},
   components: {},
   created() {
@@ -14,13 +20,16 @@ export default {
   data() {
     return {}
   },
-  methods: {},
+  methods: {
+    goHome() {
+      this.$router.replace({path:'/'})
+    }
+  },
 }
 </script>
 
 <style lang="less" scoped>
-.404
-{
+#notFound{
 
 }
 </style>

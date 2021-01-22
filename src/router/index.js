@@ -51,7 +51,10 @@ const routes = [
   }, {
     path: '*',
     name: '/404',
-    component: () => import('@/views/404')
+    component: () => import('@/views/404'),
+    meta: {
+      title: 'Page Not Found -资源管理系统'
+    }
   }
 ]
 
