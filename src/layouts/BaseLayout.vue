@@ -2,25 +2,37 @@
   <a-layout id="BaseLayout">
     <a-layout-sider :trigger="null" breakpoint="md" v-model="collapsed">
       <div class="logo"/>
-      <a-menu :default-selected-keys="[$route.path]" mode="inline" theme="dark">
-        <!--<a-menu-item key="/addResource">
-          <router-link to="/addResource">
-            <a-icon type="video-camera"/>
-            <span>添加资源</span>
-          </router-link>
-        </a-menu-item>-->
-        <a-menu-item key="/resource">
-          <router-link to="/resource">
-            <a-icon type="video-camera"/>
-            <span>资源列表</span>
-          </router-link>
-        </a-menu-item>
-        <a-menu-item key="/upload">
-          <router-link to="/upload">
-            <a-icon type="video-camera"/>
-            <span>图片上传</span>
-          </router-link>
-        </a-menu-item>
+      <a-menu
+        :default-open-keys="['resourceMgr']"
+        :default-selected-keys="[$route.path]"
+        mode="inline" theme="dark">
+        <a-sub-menu key="resourceMgr">
+          <span slot="title">
+              <a-icon type="unordered-list"/>
+              资源管理系统
+          </span>
+          <a-menu-item key="/resource">
+            <router-link to="/resource">
+              <span>资源管理</span>
+            </router-link>
+          </a-menu-item>
+          <a-menu-item key="/type">
+            <router-link to="/type">
+              <span>分类管理</span>
+            </router-link>
+          </a-menu-item>
+        </a-sub-menu>
+        <a-sub-menu key="uploadMgr">
+          <span slot="title">
+            <a-icon type="upload" />
+              文件管理系统
+          </span>
+          <a-menu-item key="/upload">
+            <router-link to="/upload">
+              <span>图片上传</span>
+            </router-link>
+          </a-menu-item>
+        </a-sub-menu>
       </a-menu>
     </a-layout-sider>
     <a-layout>
