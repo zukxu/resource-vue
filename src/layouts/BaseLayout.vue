@@ -1,16 +1,16 @@
 <template>
   <a-layout id="BaseLayout">
-    <a-layout-sider :trigger="null" breakpoint="md" v-model="collapsed">
+    <a-layout-sider :trigger="null" breakpoint="lg" v-model="collapsed">
       <div class="logo"/>
       <a-menu
         :default-open-keys="['resourceMgr']"
         :default-selected-keys="[$route.path]"
         mode="inline" theme="dark">
         <a-sub-menu key="resourceMgr">
-          <span slot="title">
-              <a-icon type="unordered-list"/>
-              资源管理系统
-          </span>
+          <div slot="title">
+            <a-icon type="unordered-list"/>
+            <span>资源管理系统</span>
+          </div>
           <a-menu-item key="/resource">
             <router-link to="/resource">
               <span>资源管理</span>
@@ -23,10 +23,10 @@
           </a-menu-item>
         </a-sub-menu>
         <a-sub-menu key="uploadMgr">
-          <span slot="title">
-            <a-icon type="upload" />
-              文件管理系统
-          </span>
+          <div slot="title">
+            <a-icon type="upload"/>
+            <span>文件管理系统</span>
+          </div>
           <a-menu-item key="/upload">
             <router-link to="/upload">
               <span>图片上传</span>
