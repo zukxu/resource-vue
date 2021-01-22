@@ -39,6 +39,13 @@ const routes = [
         meta: {
           title: '分类管理'
         }
+      },{
+        path: '/affair',
+        name: 'affair',
+        component: () => import('@/views/admin/resources/Affair'),
+        meta: {
+          title: '事务管理'
+        }
       }, {
         path: '/upload',
         name: 'upload',

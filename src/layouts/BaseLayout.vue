@@ -21,6 +21,11 @@
               <span>分类管理</span>
             </router-link>
           </a-menu-item>
+          <a-menu-item key="/affair">
+            <router-link to="/affair">
+              <span>事务管理</span>
+            </router-link>
+          </a-menu-item>
         </a-sub-menu>
         <a-sub-menu key="uploadMgr">
           <div slot="title">
