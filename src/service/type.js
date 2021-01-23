@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import type from '../service/typeAPI'
 
 // 获取详细信息【get 请求】
-export function getType(params) {
+export function getTypeById(params) {
   type.getType.params = params
   return request(type.getType)
 }
