@@ -2,9 +2,11 @@
   <div id="Type">
     <a-card :bordered="false" :style="{ height: '100%' }">
       <a-row>
+        <!--分类树-->
         <a-col :span="10">
           <a-tree :replaceFields="replaceFields" :tree-data="typeList" @click="onCheck"/>
         </a-col>
+        <!--详细-->
         <a-col :span="12">
           <a-space>
             <a-space>
@@ -12,7 +14,7 @@
                 新增顶级分类
               </a-button>
               <a-button
-                @click=";(visibleTow = true), (fileListBig = []), (fileListSmall = [])"
+                @click=";(visibleTow = true), (fileListBig = []), (typeIconList = [])"
                 type="primary"
                 v-if="typeForm.id"
               >
@@ -43,7 +45,7 @@
                 <a-form-model-item label="分类排序" prop="sort">
                   <a-input-number
                     :disabled="disabled"
-                    placeholder="请输入分类排序(-1 为首页超值必选)"
+                    placeholder="请输入分类排序(-1 )"
                     v-model.trim="typeForm.sort"
                   />
                 </a-form-model-item>
@@ -51,19 +53,19 @@
             </a-row>
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-model-item label="分类小图标">
+                <a-form-model-item label="分类图标">
                   <a-upload
                     :disabled="disabled"
-                    :file-list="fileListSmall"
-                    :headers="uploadHeaders"
+                    :file-list="typeIconList"
                     :multiple="false"
-                    @change="handleUploadChangeSmall"
-                    action="/oss/file/upload"
+                    @change="handleUploadIcon"
+                    accept="image/*"
+                    action="/minio/"
                     list-type="picture-card"
-                    method="POST"
                     name="file"
                   >
-                    <div v-if="fileListSmall.length < 1">
+                    <!--@preview="handlePreview"-->
+                    <div v-if="typeIconList.length < 1">
                       <a-icon type="plus"/>
                       <div class="ant-upload-text">
                         上传小图标
@@ -72,30 +74,8 @@
                   </a-upload>
                 </a-form-model-item>
               </a-col>
-              <!-- <a-col :span="12">
-                 <a-form-model-item label="分类大图标">
-                   <a-upload
-                     :disabled="disabled"
-                     :file-list="fileListBig"
-                     :headers="uploadHeaders"
-                     :multiple="false"
-                     @change="handleUploadChangeBig"
-                     action="/oss/file/upload"
-                     list-type="picture-card"
-                     method="POST"
-                     name="file"
-                   >
-                     <div v-if="fileListBig.length < 1">
-                       <a-icon type="plus"/>
-                       <div class="ant-upload-text">
-                         上传大图标
-                       </div>
-                     </div>
-                   </a-upload>
-                 </a-form-model-item>
-               </a-col>-->
             </a-row>
-            <div v-if="disabled == false">
+            <div v-if="disabled === false">
               <a-button :style="{ marginRight: '8px' }" @click="onClose">
                 取消
               </a-button>
@@ -106,6 +86,7 @@
           </a-form-model>
         </a-col>
       </a-row>
+      <!--顶级分类-->
       <a-drawer
         :body-style="{ paddingBottom: '80px' }"
         :visible="visible"
@@ -130,47 +111,23 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-model-item label="分类小图标">
+              <a-form-model-item label="分类图标">
                 <a-upload
-                  :file-list="fileListSmall"
-                  :headers="uploadHeaders"
-                  :multiple="false"
-                  @change="handleUploadChangeSmall"
-                  action="/oss/file/upload"
+                  :file-list="typeIconList"
+                  @change="handleUploadIcon"
+                  action="/minio/"
                   list-type="picture-card"
-                  method="POST"
                   name="file"
                 >
-                  <div v-if="fileListSmall.length < 1">
+                  <div v-if="typeIconList.length < 1">
                     <a-icon type="plus"/>
                     <div class="ant-upload-text">
-                      上传小图标
+                      上传图标
                     </div>
                   </div>
                 </a-upload>
               </a-form-model-item>
             </a-col>
-            <!-- <a-col :span="12">
-               <a-form-model-item label="分类大图标">
-                 <a-upload
-                   :file-list="fileListBig"
-                   :headers="uploadHeaders"
-                   :multiple="false"
-                   @change="handleUploadChangeBig"
-                   action="/oss/file/upload"
-                   list-type="picture-card"
-                   method="POST"
-                   name="file"
-                 >
-                   <div v-if="fileListBig.length < 1">
-                     <a-icon type="plus"/>
-                     <div class="ant-upload-text">
-                       上传大图标
-                     </div>
-                   </div>
-                 </a-upload>
-               </a-form-model-item>
-             </a-col>-->
           </a-row>
           <div
             :style="{
@@ -193,8 +150,8 @@
             </a-button>
           </div>
         </a-form-model>
-      </a-drawer
-      >
+      </a-drawer>
+      <!--增加子集-->
       <a-drawer
         :body-style="{ paddingBottom: '80px' }"
         :visible="visibleTow"
@@ -219,47 +176,23 @@
           </a-row>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-model-item label="分类小图标">
+              <a-form-model-item label="分类图标">
                 <a-upload
-                  :file-list="fileListSmall"
-                  :headers="uploadHeaders"
-                  :multiple="false"
-                  @change="handleUploadChangeSmall"
-                  action="/oss/file/upload"
+                  :file-list="typeIconList"
+                  @change="handleUploadIcon"
+                  action="/minio/"
                   list-type="picture-card"
-                  method="POST"
                   name="file"
                 >
-                  <div v-if="fileListSmall.length < 1">
+                  <div v-if="typeIconList.length < 1">
                     <a-icon type="plus"/>
                     <div class="ant-upload-text">
-                      上传小图标
+                      上传图标
                     </div>
                   </div>
                 </a-upload>
               </a-form-model-item>
             </a-col>
-            <!--<a-col :span="12">
-              <a-form-model-item label="分类大图标">
-                <a-upload
-                  :file-list="fileListBig"
-                  :headers="uploadHeaders"
-                  :multiple="false"
-                  @change="handleUploadChangeBig"
-                  action="/oss/file/upload"
-                  list-type="picture-card"
-                  method="POST"
-                  name="file"
-                >
-                  <div v-if="fileListBig.length < 1">
-                    <a-icon type="plus"/>
-                    <div class="ant-upload-text">
-                      上传大图标
-                    </div>
-                  </div>
-                </a-upload>
-              </a-form-model-item>
-            </a-col>-->
           </a-row>
 
           <div
@@ -273,8 +206,7 @@
             background: '#ffffff',
             textAlign: 'right',
             zIndex: 1
-          }"
-          >
+          }">
             <a-button :style="{ marginRight: '8px' }" @click="onClose">
               取消
             </a-button>
@@ -293,11 +225,11 @@ import {addType, delType, getTypeById, listType, updType} from '@/service/type'
 export default {
   data() {
     return {
-      fileListSmall: [],
-      fileListBig: [],
-      uploadHeaders: {
-        Authorization: 'Bearer ' + this.$store.getters.accessToken
-      },
+      typeList: [],
+      //树形组件配置
+      replaceFields: {children: 'children', title: 'typeName', key: 'id'},
+      //图标上传列表
+      typeIconList: [],
       typeForm: {
         id: undefined,
         typeName: undefined,
@@ -310,12 +242,10 @@ export default {
         sort: '',
         icon: ''
       },
-      visibleTow: false,
       disabled: true,
-      replaceFields: {children: 'children', title: 'typeName', key: 'id'},
-      typeList: [],
       pageLoading: true,
       visible: false,
+      visibleTow: false,
       banOnSubmit: false,
       typeListTow: [],
       typeRules: {
@@ -325,14 +255,8 @@ export default {
         ],
         sort: [{required: true, message: '请输入分类排序', trigger: 'blur'}]
       },
-      treeData: [
-        {title: 'Expand to load', key: '0'},
-        {title: 'Expand to load', key: '1'},
-        {title: 'Tree Node', key: '2', isLeaf: true}
-      ],
       eventKey: undefined,
       copyClickData: {},
-      router: '/oss/file/preview/'
     }
   },
   created() {
@@ -340,31 +264,26 @@ export default {
     this.listType()
   },
   methods: {
-    handleUploadChangeBig({file, fileList}) {
-      this.fileListBig = fileList
-      if (file.status == 'done') {
-        //获取上传完成返回的对象名
-        this.addForm.icon = file.response.data.bucketName + '/' + file.response.data.fileName
-        this.typeForm.icon = file.response.data.bucketName + '/' + file.response.data.fileName
-      }
-    },
-    handleUploadChangeSmall({file, fileList}) {
-      this.fileListSmall = fileList
+    //上传
+    handleUploadIcon({file, fileList}) {
+      this.typeIconList = fileList
       if (file.status == 'done') {
         //获取上传完成返回的对象名
         this.addForm.img = file.response.data.bucketName + '/' + file.response.data.fileName
         this.typeForm.img = file.response.data.bucketName + '/' + file.response.data.fileName
       }
     },
+    //确认删除
     confirm(e) {
       console.log(e)
       this.delType()
-      // this.$message.success('删除成功')
     },
+    //取消
     cancel(e) {
       // console.log(e)
       // this.$message.error('Click on No')
     },
+    //删除
     delType() {
       console.log('---------------------', this.typeForm)
       delType(this.typeForm.id).then(res => {
@@ -378,24 +297,26 @@ export default {
         }
       })
     },
+    //选中查看详情
     onCheck(checkedKeys, info) {
-      console.log(checkedKeys)
       console.log(info)
-      this.copyClickData = info
+      console.log(info.dataRef)
+      this.typeForm =
+        this.copyClickData = info
       this.eventKey = info.eventKey
       this.typeForm.id = info.eventKey
-      this.typeForm.typeName = info.label
-      this.fileListSmall = []
+      this.typeForm.typeName = info.title
+      this.typeIconList = []
       this.fileListBig = []
-      console.log()
-      getTypeById(this.typeForm.id).then(res => {
+      console.log(this.typeForm)
+      getTypeById({id: this.typeForm.id}).then(res => {
         if (res.status == 1) {
           this.typeForm.sort = res.data.sort
           const smallImgUrl = this.router + res.data.img
           var smallUrl = new Image()
           smallUrl.src = smallImgUrl
           if (res.data.img) {
-            this.fileListSmall.push({
+            this.typeIconList.push({
               uid: -1,
               url: smallImgUrl,
               name: 'image' + 1,
@@ -413,10 +334,11 @@ export default {
               status: 'done'
             })
           }
-          console.log('当前选择的值的ID的详情', this.fileListSmall)
+          console.log('当前选择的值的ID的详情', this.typeIconList)
         }
       })
     },
+    //添加新的子集
     addTypeTow() {
       this.$refs.typeRuleForm.validate(val => {
         if (val) {
@@ -438,6 +360,7 @@ export default {
         }
       })
     },
+    //添加分类
     addType() {
       this.$refs.typeRuleForm.validate(val => {
         if (val) {
@@ -456,6 +379,7 @@ export default {
         }
       })
     },
+    //更新
     updType() {
       this.$refs.typeRuleForm.validate(val => {
         if (val) {
@@ -472,6 +396,7 @@ export default {
         }
       })
     },
+    //关闭drawer
     onClose() {
       this.visible = false
       this.visibleTow = false
@@ -485,19 +410,7 @@ export default {
         parentId: undefined
       }
     },
-    listTypeTow(id) {
-      this.typeListTow = []
-      listType(id)
-        .then(res => {
-          this.typeListTow = res.data
-          console.log('子类', this.typeListTow)
-          this.$forceUpdate()
-          console.log('执行了')
-        })
-        .catch(() => {
-          this.$message.error('请求失败')
-        })
-    },
+    //初始化
     listType() {
       listType()
         .then(res => {
