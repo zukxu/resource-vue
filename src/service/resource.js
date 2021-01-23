@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import resource from '../service/resourceAPI'
+import resource from '@/service/api/resourceAPI'
 
 // 获取详细信息【get 请求】
 export function getRes(params) {

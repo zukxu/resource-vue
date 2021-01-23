@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import af from '../service/affairAPI'
+import af from '@/service/api/affairAPI'
 
 // 审核
 export function affair(entity) {

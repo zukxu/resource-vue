@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type from '../service/typeAPI'
+import type from '@/service/api/typeAPI'
 
 // 获取详细信息【get 请求】
 export function getTypeById(params) {
