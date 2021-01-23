@@ -6,7 +6,7 @@ const TYPE_API = {
     params: ''
   },
   //获取资源
-  getType: {
+  getTypeById: {
     method: 'get',
     url: '/type',
     params: ''

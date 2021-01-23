@@ -6,32 +6,35 @@
           <a-tree :replaceFields="replaceFields" :tree-data="typeList" @click="onCheck"/>
         </a-col>
         <a-col :span="12">
-          <a-button @click="visible = true" type="primary">
-            新增顶级分类
-          </a-button>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <a-button
-            @click=";(visibleTow = true), (fileListBig = []), (fileListSmall = [])"
-            type="primary"
-            v-if="typeForm.id"
-          >
-            新增子级分类
-          </a-button>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <a-button @click="disabled = false" type="primary" v-if="typeForm.id">
-            修改
-          </a-button>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <a-popconfirm @cancel="cancel" @confirm="confirm" cancel-text="否" ok-text="是" title="确定要删除吗?">
-            <a-button type="danger" v-if="typeForm.id">
-              删除
-            </a-button>
-          </a-popconfirm>
+          <a-space>
+            <a-space>
+              <a-button @click="visible = true" type="primary">
+                新增顶级分类
+              </a-button>
+              <a-button
+                @click=";(visibleTow = true), (fileListBig = []), (fileListSmall = [])"
+                type="primary"
+                v-if="typeForm.id"
+              >
+                新增子级分类
+              </a-button>
+            </a-space>
+            <a-space>
+              <a-button @click="disabled = false" type="primary" v-if="typeForm.id">
+                修改
+              </a-button>
+              <a-popconfirm @cancel="cancel" @confirm="confirm" cancel-text="否" ok-text="是" title="确定要删除吗?">
+                <a-button type="danger" v-if="typeForm.id">
+                  删除
+                </a-button>
+              </a-popconfirm>
+            </a-space>
+          </a-space>
           <a-form-model :model="typeForm" :rules="typeRules" ref="typeRuleForm">
             <a-row>
               <a-col :span="12">
                 <a-form-model-item label="分类名称" prop="label">
-                  <a-input :disabled="disabled" placeholder="请输入分类名称" v-model="typeForm.label"/>
+                  <a-input :disabled="disabled" placeholder="请输入分类名称" v-model="typeForm.typeName"/>
                 </a-form-model-item>
               </a-col>
             </a-row>
@@ -69,28 +72,28 @@
                   </a-upload>
                 </a-form-model-item>
               </a-col>
-              <a-col :span="12">
-                <a-form-model-item label="分类大图标">
-                  <a-upload
-                    :disabled="disabled"
-                    :file-list="fileListBig"
-                    :headers="uploadHeaders"
-                    :multiple="false"
-                    @change="handleUploadChangeBig"
-                    action="/oss/file/upload"
-                    list-type="picture-card"
-                    method="POST"
-                    name="file"
-                  >
-                    <div v-if="fileListBig.length < 1">
-                      <a-icon type="plus"/>
-                      <div class="ant-upload-text">
-                        上传大图标
-                      </div>
-                    </div>
-                  </a-upload>
-                </a-form-model-item>
-              </a-col>
+              <!-- <a-col :span="12">
+                 <a-form-model-item label="分类大图标">
+                   <a-upload
+                     :disabled="disabled"
+                     :file-list="fileListBig"
+                     :headers="uploadHeaders"
+                     :multiple="false"
+                     @change="handleUploadChangeBig"
+                     action="/oss/file/upload"
+                     list-type="picture-card"
+                     method="POST"
+                     name="file"
+                   >
+                     <div v-if="fileListBig.length < 1">
+                       <a-icon type="plus"/>
+                       <div class="ant-upload-text">
+                         上传大图标
+                       </div>
+                     </div>
+                   </a-upload>
+                 </a-form-model-item>
+               </a-col>-->
             </a-row>
             <div v-if="disabled == false">
               <a-button :style="{ marginRight: '8px' }" @click="onClose">
@@ -147,27 +150,27 @@
                 </a-upload>
               </a-form-model-item>
             </a-col>
-            <a-col :span="12">
-              <a-form-model-item label="分类大图标">
-                <a-upload
-                  :file-list="fileListBig"
-                  :headers="uploadHeaders"
-                  :multiple="false"
-                  @change="handleUploadChangeBig"
-                  action="/oss/file/upload"
-                  list-type="picture-card"
-                  method="POST"
-                  name="file"
-                >
-                  <div v-if="fileListBig.length < 1">
-                    <a-icon type="plus"/>
-                    <div class="ant-upload-text">
-                      上传大图标
-                    </div>
-                  </div>
-                </a-upload>
-              </a-form-model-item>
-            </a-col>
+            <!-- <a-col :span="12">
+               <a-form-model-item label="分类大图标">
+                 <a-upload
+                   :file-list="fileListBig"
+                   :headers="uploadHeaders"
+                   :multiple="false"
+                   @change="handleUploadChangeBig"
+                   action="/oss/file/upload"
+                   list-type="picture-card"
+                   method="POST"
+                   name="file"
+                 >
+                   <div v-if="fileListBig.length < 1">
+                     <a-icon type="plus"/>
+                     <div class="ant-upload-text">
+                       上传大图标
+                     </div>
+                   </div>
+                 </a-upload>
+               </a-form-model-item>
+             </a-col>-->
           </a-row>
           <div
             :style="{
@@ -236,7 +239,7 @@
                 </a-upload>
               </a-form-model-item>
             </a-col>
-            <a-col :span="12">
+            <!--<a-col :span="12">
               <a-form-model-item label="分类大图标">
                 <a-upload
                   :file-list="fileListBig"
@@ -256,7 +259,7 @@
                   </div>
                 </a-upload>
               </a-form-model-item>
-            </a-col>
+            </a-col>-->
           </a-row>
 
           <div
@@ -280,8 +283,7 @@
             </a-button>
           </div>
         </a-form-model>
-      </a-drawer
-      >
+      </a-drawer>
     </a-card>
   </div>
 </template>
@@ -297,22 +299,20 @@ export default {
         Authorization: 'Bearer ' + this.$store.getters.accessToken
       },
       typeForm: {
-        label: undefined,
         id: undefined,
+        typeName: undefined,
         sort: '',
-        img: '',
         icon: ''
       },
       addForm: {
-        label: undefined,
         id: undefined,
+        typeName: undefined,
         sort: '',
-        img: '',
         icon: ''
       },
       visibleTow: false,
       disabled: true,
-      replaceFields: {children: 'children', title: 'label', key: 'key'},
+      replaceFields: {children: 'children', title: 'typeName', key: 'id'},
       typeList: [],
       pageLoading: true,
       visible: false,
@@ -379,12 +379,15 @@ export default {
       })
     },
     onCheck(checkedKeys, info) {
+      console.log(checkedKeys)
+      console.log(info)
       this.copyClickData = info
       this.eventKey = info.eventKey
       this.typeForm.id = info.eventKey
-      this.typeForm.label = info.label
+      this.typeForm.typeName = info.label
       this.fileListSmall = []
       this.fileListBig = []
+      console.log()
       getTypeById(this.typeForm.id).then(res => {
         if (res.status == 1) {
           this.typeForm.sort = res.data.sort
@@ -414,30 +417,6 @@ export default {
         }
       })
     },
-    // onLoadData(typeList) {
-    //   console.log('点击后的数据', typeList.eventKey)
-    //   this.copyClickData = typeList
-    //   this.listTypeTow(typeList.eventKey)
-    //   return new Promise(resolve => {
-    //     if (typeList.dataRef.children) {
-    //       resolve()
-    //       return
-    //     }
-    //     setTimeout(() => {
-    //       if (this.typeListTow.length > 0) {
-    //         const info = []
-    //         for (var i in this.typeListTow) {
-    //           info.push(this.typeListTow[i])
-    //         }
-    //         typeList.dataRef.children = info
-    //         this.typeList = [...this.typeList]
-    //       } else {
-    //         alert('无下级分类')
-    //       }
-    //       resolve()
-    //     }, 1000)
-    //   })
-    // },
     addTypeTow() {
       this.$refs.typeRuleForm.validate(val => {
         if (val) {
@@ -522,7 +501,7 @@ export default {
     listType() {
       listType()
         .then(res => {
-          this.typeList = res.data
+          this.typeList = res.data.data.records
           console.log('父菜单的数据', this.typeList)
           this.pageLoading = false
         })

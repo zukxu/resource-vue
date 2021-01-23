@@ -3,8 +3,8 @@ import type from '../service/typeAPI'
 
 // 获取详细信息【get 请求】
 export function getTypeById(params) {
-  type.getType.params = params
-  return request(type.getType)
+  type.getTypeById.params = params
+  return request(type.getTypeById)
 }
 
 // 获取详细列表信息【get 请求】
