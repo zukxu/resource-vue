@@ -25,7 +25,7 @@
               <a-button @click="disabled = false" type="primary" v-if="typeForm.id">
                 修改
               </a-button>
-              <a-popconfirm @cancel="cancel" @confirm="confirm" cancel-text="否" ok-text="是" title="确定要删除吗?">
+              <a-popconfirm @confirm="confirm" cancel-text="否" ok-text="是" title="确定要删除吗?">
                 <a-button type="danger" v-if="typeForm.id">
                   删除
                 </a-button>
@@ -45,7 +45,7 @@
                 <a-form-model-item label="分类排序" prop="sort">
                   <a-input-number
                     :disabled="disabled"
-                    placeholder="请输入分类排序(-1 )"
+                    placeholder="请输入分类排序"
                     v-model.trim="typeForm.sort"
                   />
                 </a-form-model-item>
@@ -230,6 +230,7 @@ export default {
       replaceFields: {children: 'children', title: 'typeName', key: 'id'},
       //图标上传列表
       typeIconList: [],
+      ziyuan: {},
       typeForm: {
         id: undefined,
         typeName: undefined,
@@ -278,15 +279,10 @@ export default {
       console.log(e)
       this.delType()
     },
-    //取消
-    cancel(e) {
-      // console.log(e)
-      // this.$message.error('Click on No')
-    },
     //删除
     delType() {
       console.log('---------------------', this.typeForm)
-      delType(this.typeForm.id).then(res => {
+      delType({id: this.typeForm.id}).then(res => {
         if (res.status === 1) {
           this.$message.success('删除成功')
           this.pageLoading = true
@@ -299,15 +295,11 @@ export default {
     },
     //选中查看详情
     onCheck(checkedKeys, info) {
-      console.log(info)
-      console.log(info.dataRef)
-      this.typeForm =
-        this.copyClickData = info
-      this.eventKey = info.eventKey
-      this.typeForm.id = info.eventKey
-      this.typeForm.typeName = info.title
+      this.typeForm = info.dataRef
+      /*if (this.typeForm.icon === undefined) {
+        this.typeIconList.push(this.ziyuan)
+      }*/
       this.typeIconList = []
-      this.fileListBig = []
       console.log(this.typeForm)
       getTypeById({id: this.typeForm.id}).then(res => {
         if (res.status == 1) {
