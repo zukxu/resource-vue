@@ -4,7 +4,8 @@
       <a-row>
         <!--分类树-->
         <a-col :span="10">
-          <a-tree :replaceFields="replaceFields" :show-icon=true :tree-data="typeList" @select="onSelect">
+          <a-tree :replaceFields="replaceFields" :tree-data="typeList"
+                  @select="onSelect">
             <a-icon slot="icon" type="tags"/>
           </a-tree>
         </a-col>
@@ -12,11 +13,18 @@
         <a-col :span="12">
           <a-space>
             <a-space>
-              <a-button @click="visible = true" type="primary">
+              <a-button @click="()=>{
+                addTitle='新增顶级分类'
+                visible = true
+                }" type="primary">
                 新增顶级分类
               </a-button>
               <a-button
-                @click=";(visibleTow = true),(typeIconList = [])"
+                @click="()=>{
+                addTitle='新增子级分类'
+                visible = true
+                visibleChild=true
+                }"
                 type="primary"
                 v-if="typeForm.id"
               >
@@ -93,128 +101,53 @@
       <!--顶级分类-->
       <a-drawer
         :body-style="{ paddingBottom: '80px' }"
+        :title="addTitle"
         :visible="visible"
-        :width="720"
+        :width="420"
         @close="onClose"
-        title="新增顶级分类"
       >
         <a-form-model :model="addForm" :rules="typeRules" ref="typeRuleForm">
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-model-item label="分类名称" prop="typeName">
-                <a-input placeholder="请输入分类名称" v-model.trim="addForm.typeName"/>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-model-item label="分类排序" prop="sort">
-                <a-input-number placeholder="请输入分类排序" v-model.trim="addForm.sort"/>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-model-item label="分类图标">
-                <a-upload
-                  :file-list="typeIconList"
-                  @change="handleUploadIcon"
-                  action="/minio/"
-                  list-type="picture-card"
-                  name="file"
-                >
-                  <div v-if="typeIconList.length < 1">
-                    <a-icon type="plus"/>
-                    <div class="ant-upload-text">
-                      上传图标
-                    </div>
-                  </div>
-                </a-upload>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-          <div
-            :style="{
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            width: '100%',
-            borderTop: '1px solid #e9e9e9',
-            padding: '10px 16px',
-            background: '#ffffff',
-            textAlign: 'right',
-            zIndex: 1
-          }"
+          <a-form-model-item label="父分类名称" v-if="visibleChild">
+            <a-input disabled v-model.trim="addForm.parentName"/>
+          </a-form-model-item>
+          <a-form-model-item label="分类名称" prop="typeName">
+            <a-input placeholder="请输入分类名称" v-model.trim="addForm.typeName"/>
+          </a-form-model-item>
+          <a-form-model-item label="分类排序" prop="sort">
+            <a-input-number :min=0 :style="{width:'100%'}" placeholder="请输入分类排序" v-model.trim="addForm.sort"/>
+          </a-form-model-item>
+          <a-form-model-item label="分类图标">
+            <a-upload
+              :file-list="typeIconList"
+              @change="handleUploadIcon"
+              action="http://localhost:8099/minio/"
+              list-type="picture-card"
+              name="file"
+            >
+              <div v-if="typeIconList.length < 1">
+                <a-icon type="plus"/>
+                <div class="ant-upload-text">
+                  上传图标
+                </div>
+              </div>
+            </a-upload>
+          </a-form-model-item>
+          <div :style="{
+                  position: 'absolute',
+                  right: 0,
+                  bottom: 0,
+                  width: '100%',
+                  borderTop: '1px solid #e9e9e9',
+                  padding: '10px 16px',
+                  background: '#ffffff',
+                  textAlign: 'right',
+                  zIndex: 1,
+              }"
           >
             <a-button :style="{ marginRight: '8px' }" @click="onClose">
               取消
             </a-button>
             <a-button @click="addType" type="primary">
-              确定
-            </a-button>
-          </div>
-        </a-form-model>
-      </a-drawer>
-      <!--增加子集-->
-      <a-drawer
-        :body-style="{ paddingBottom: '80px' }"
-        :visible="visibleTow"
-        :width="720"
-        @close="onClose"
-        title="新增子级分类"
-      >
-        <a-form-model :model="addForm" :rules="typeRules" ref="typeRuleForm">
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-model-item label="分类名称" prop="typeName">
-                <a-input placeholder="请输入分类名称" v-model="addForm.typeName"/>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-model-item label="分类排序" prop="sort">
-                <a-input-number placeholder="请输入分类排序" v-model.trim="addForm.sort"/>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-model-item label="分类图标">
-                <a-upload
-                  :file-list="typeIconList"
-                  @change="handleUploadIcon"
-                  action="/minio/"
-                  list-type="picture-card"
-                  name="file"
-                >
-                  <div v-if="typeIconList.length < 1">
-                    <a-icon type="plus"/>
-                    <div class="ant-upload-text">
-                      上传图标
-                    </div>
-                  </div>
-                </a-upload>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-
-          <div
-            :style="{
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            width: '100%',
-            borderTop: '1px solid #e9e9e9',
-            padding: '10px 16px',
-            background: '#ffffff',
-            textAlign: 'right',
-            zIndex: 1
-          }">
-            <a-button :style="{ marginRight: '8px' }" @click="onClose">
-              取消
-            </a-button>
-            <a-button @click="addTypeTow" type="primary">
               确定
             </a-button>
           </div>
@@ -243,17 +176,20 @@ export default {
       addForm: {
         id: undefined,
         typeName: undefined,
+        parentId: undefined,
+        parentName: undefined,
         sort: '',
         icon: ''
       },
       disabled: true,
       pageLoading: true,
       visible: false,
-      visibleTow: false,
+      visibleChild: false,
       typeRules: {
         typeName: [{required: true, message: '请输入分类名称', trigger: 'blur'}],
         sort: [{required: true, message: '请输入分类排序', trigger: 'blur'}]
       },
+      addTitle: '新增顶级分类'
     }
   },
   created() {
@@ -263,61 +199,21 @@ export default {
   methods: {
     //上传
     handleUploadIcon({file, fileList}) {
-      console.log(file)
-      console.log(fileList)
       this.typeIconList = fileList
       if (file.status === 'done') {
         //获取上传完成返回的对象名
-        this.addForm.icon = file.response.data.bucketName + '/' + file.response.data.fileName
-        this.typeForm.icon = file.response.data.bucketName + '/' + file.response.data.fileName
+        console.log(file)
+        this.addForm.icon = file.response.data.url
+        this.typeForm.icon = file.response.data.url
       }
-    },
-
-    //添加新的子集
-    addTypeTow() {
-      this.$refs.typeRuleForm.validate(val => {
-        if (val) {
-          this.addForm.parentId = this.typeForm.id
-          addType(this.addForm).then(res => {
-            if (res.status === 1) {
-              this.$message.success('添加成功')
-              this.pageLoading = true
-              this.onClose()
-              this.listType()
-
-            } else if (res.status === 2) {
-              this.$message.success(res.msg)
-            } else {
-              this.$message.error('添加失败')
-            }
-          })
-        }
-      })
-    },
-    //添加分类
-    addType() {
-      this.$refs.typeRuleForm.validate(val => {
-        if (val) {
-          addType(this.addForm).then(res => {
-            if (res.status === 1) {
-              this.$message.success('添加成功')
-              this.pageLoading = true
-              this.onClose()
-              this.listType()
-            } else if (res.status === 2) {
-              this.$message.success(res.msg)
-            } else {
-              this.$message.error('添加失败')
-            }
-          })
-        }
-      })
     },
 
     //选中查看详情
     onSelect(checkedKeys, info) {
       this.disabled = true
       this.typeForm = JSON.parse(JSON.stringify(info.node.dataRef))
+      this.addForm.parentId = this.typeForm.id
+      this.addForm.parentName = this.typeForm.typeName
       //重新置空
       this.typeIconList = []
       if (this.typeForm.icon !== undefined) {
@@ -329,13 +225,32 @@ export default {
         })
       }
     },
+    //添加分类
+    addType() {
+      this.$refs['typeRuleForm'].validate(val => {
+        if (val) {
+          if (this.addForm.icon.length < 1) {
+            this.addForm.icon = undefined
+          }
+          addType(this.addForm).then(res => {
+            if (res.data.code === 1) {
+              this.$message.success('添加成功')
+              this.pageLoading = true
+              this.onClose()
+              this.listType()
+            } else {
+              this.$message.error('添加失败')
+            }
+          })
+        }
+      })
+    },
     //更新
     updType() {
-      console.log(this.typeForm)
-      this.$refs.typeRuleForm.validate(val => {
+      this.$refs['typeRuleForm'].validate(val => {
         if (val) {
           updType(this.typeForm).then(res => {
-            if (res.code === 1) {
+            if (res.data.code === 1) {
               this.$message.success('修改成功')
               this.pageLoading = true
               this.onClose()
@@ -350,7 +265,6 @@ export default {
 
     //删除
     delType() {
-      console.log('---------------------', this.typeForm)
       delType(this.typeForm.id).then(res => {
         if (res.data.code === 1) {
           this.$message.success('删除成功')
@@ -365,6 +279,7 @@ export default {
     //关闭drawer
     onClose() {
       this.visible = false
+      this.visibleChild = false
       this.disabled = true
       this.typeForm = {
         id: undefined,
@@ -372,27 +287,27 @@ export default {
       }
       this.addForm = {
         typeName: undefined,
-        parentId: undefined
+        parentId: undefined,
+        parentName: undefined
       }
+      this.typeIconList=[]
+      this.$refs['typeRuleForm'].resetFields()
     },
     //初始化
     listType() {
       listType().then(res => {
-        this.typeList = res.data.data.records
+        this.typeList = res.data.data
         this.pageLoading = false
       })
         .catch(() => {
           this.$message.error('请求失败')
         })
-    }
+    },
   }
 }
 </script>
 <style lang="less" scoped>
 #Type{
-  .ant-input-number{
-    width: 100%;
-  }
 
 }
 </style>
