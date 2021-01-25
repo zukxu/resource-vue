@@ -27,7 +27,7 @@
               <a-button @click="disabled = false" type="primary" v-if="typeForm.id">
                 修改
               </a-button>
-              <a-popconfirm @confirm="confirm" cancel-text="否" ok-text="是" title="确定要删除吗?">
+              <a-popconfirm @confirm="delType" cancel-text="否" ok-text="是" title="确定要删除吗?">
                 <a-button type="danger" v-if="typeForm.id">
                   删除
                 </a-button>
@@ -48,6 +48,7 @@
                 <a-form-model-item label="分类排序" prop="sort">
                   <a-input-number
                     :disabled="disabled"
+                    :min=0
                     placeholder="请输入分类排序"
                     v-model.trim="typeForm.sort"
                   />
@@ -79,7 +80,7 @@
               </a-col>
             </a-row>
             <div v-if="disabled === false">
-              <a-button :style="{ marginRight: '8px' }" @click="onClose">
+              <a-button :style="{ marginRight: '8px' }" @click="disabled = true">
                 取消
               </a-button>
               <a-button @click="updType" type="primary">
@@ -248,11 +249,9 @@ export default {
       disabled: true,
       pageLoading: true,
       visible: false,
+      visibleTow: false,
       typeRules: {
-        title: [
-          {required: true, message: '请输入分类名称', trigger: 'blur'},
-          {required: true, max: 5, message: '最大长度为5', trigger: 'blur'}
-        ],
+        typeName: [{required: true, message: '请输入分类名称', trigger: 'blur'}],
         sort: [{required: true, message: '请输入分类排序', trigger: 'blur'}]
       },
     }
@@ -264,44 +263,16 @@ export default {
   methods: {
     //上传
     handleUploadIcon({file, fileList}) {
+      console.log(file)
+      console.log(fileList)
       this.typeIconList = fileList
-      if (file.status == 'done') {
+      if (file.status === 'done') {
         //获取上传完成返回的对象名
-        this.addForm.img = file.response.data.bucketName + '/' + file.response.data.fileName
-        this.typeForm.img = file.response.data.bucketName + '/' + file.response.data.fileName
+        this.addForm.icon = file.response.data.bucketName + '/' + file.response.data.fileName
+        this.typeForm.icon = file.response.data.bucketName + '/' + file.response.data.fileName
       }
     },
-    //确认删除
-    confirm(e) {
-      console.log(e)
-      this.delType()
-    },
-    //删除
-    delType() {
-      console.log('---------------------', this.typeForm)
-      delType({id: this.typeForm.id}).then(res => {
-        if (res.status === 1) {
-          this.$message.success('删除成功')
-          this.pageLoading = true
-          this.onClose()
-          this.listType()
-        } else {
-          this.$message.error('删除失败')
-        }
-      })
-    },
-    //选中查看详情
-    onSelect(checkedKeys, info) {
-      console.log(checkedKeys)
-      console.log(info)
-      console.log(info.node.dataRef)
-      this.typeForm = JSON.parse(JSON.stringify(info.node.dataRef))
-      //重新置空
-      this.typeIconList = []
-      this.typeIconList.push(this.typeForm.icon)
-      console.log(this.typeForm)
-      console.log(this.typeIconList)
-    },
+
     //添加新的子集
     addTypeTow() {
       this.$refs.typeRuleForm.validate(val => {
@@ -342,13 +313,29 @@ export default {
         }
       })
     },
+
+    //选中查看详情
+    onSelect(checkedKeys, info) {
+      this.disabled = true
+      this.typeForm = JSON.parse(JSON.stringify(info.node.dataRef))
+      //重新置空
+      this.typeIconList = []
+      if (this.typeForm.icon !== undefined) {
+        this.typeIconList.push({
+          uid: this.typeForm.id,
+          url: this.typeForm.icon,
+          name: 'image' + 1,
+          status: 'done'
+        })
+      }
+    },
     //更新
     updType() {
+      console.log(this.typeForm)
       this.$refs.typeRuleForm.validate(val => {
         if (val) {
-          console.log(this.typeForm)
           updType(this.typeForm).then(res => {
-            if (res.status === 1) {
+            if (res.code === 1) {
               this.$message.success('修改成功')
               this.pageLoading = true
               this.onClose()
@@ -357,6 +344,21 @@ export default {
               this.$message.error('修改失败')
             }
           })
+        }
+      })
+    },
+
+    //删除
+    delType() {
+      console.log('---------------------', this.typeForm)
+      delType(this.typeForm.id).then(res => {
+        if (res.data.code === 1) {
+          this.$message.success('删除成功')
+          this.pageLoading = true
+          this.onClose()
+          this.listType()
+        } else {
+          this.$message.error('删除失败')
         }
       })
     },
