@@ -13,18 +13,11 @@
         <a-col :span="12">
           <a-space>
             <a-space>
-              <a-button @click="()=>{
-                addTitle='新增顶级分类'
-                visible = true
-                }" type="primary">
+              <a-button @click="openDrawer(1)" type="primary">
                 新增顶级分类
               </a-button>
               <a-button
-                @click="()=>{
-                addTitle='新增子级分类'
-                visible = true
-                visibleChild=true
-                }"
+                @click="openDrawer(2)"
                 type="primary"
                 v-if="typeForm.id"
               >
@@ -67,12 +60,12 @@
               <a-col :span="12">
                 <a-form-model-item label="分类图标">
                   <a-upload
+                    :action="basic+'/minio/'"
                     :disabled="disabled"
                     :file-list="typeIconList"
                     :multiple="false"
-                    @change="handleUploadIcon"
+                    @change="handleUpdIcon"
                     accept="image/*"
-                    :action="basic+'/minio/'"
                     list-type="picture-card"
                     name="file"
                   >
@@ -118,13 +111,13 @@
           </a-form-model-item>
           <a-form-model-item label="分类图标">
             <a-upload
-              :file-list="typeIconList"
-              @change="handleUploadIcon"
-              action="http://localhost:8099/minio/"
+              :action="basic+'/minio/'"
+              :file-list="addIconList"
+              @change="handleAddIcon"
               list-type="picture-card"
               name="file"
             >
-              <div v-if="typeIconList.length < 1">
+              <div v-if="addIconList.length < 1">
                 <a-icon type="plus"/>
                 <div class="ant-upload-text">
                   上传图标
@@ -167,6 +160,7 @@ export default {
       replaceFields: {children: 'children', title: 'typeName', key: 'id'},
       //图标上传列表
       typeIconList: [],
+      addIconList: [],
       typeForm: {
         id: undefined,
         typeName: undefined,
@@ -197,14 +191,22 @@ export default {
     this.listType()
   },
   methods: {
-    //上传
-    handleUploadIcon({file, fileList}) {
+    //修改
+    handleUpdIcon({file, fileList}) {
       this.typeIconList = fileList
       if (file.status === 'done') {
         //获取上传完成返回的对象名
         console.log(file)
-        this.addForm.icon = file.response.data.url
         this.typeForm.icon = file.response.data.url
+      }
+    },
+    //上传
+    handleAddIcon({file, fileList}) {
+      this.addIconList = fileList
+      if (file.status === 'done') {
+        //获取上传完成返回的对象名
+        console.log(file)
+        this.addForm.icon = file.response.data.url
       }
     },
 
@@ -212,21 +214,32 @@ export default {
     onSelect(checkedKeys, info) {
       this.disabled = true
       this.typeForm = JSON.parse(JSON.stringify(info.node.dataRef))
-      this.addForm.parentId = this.typeForm.id
       this.addForm.parentName = this.typeForm.typeName
       //重新置空
       this.typeIconList = []
       if (this.typeForm.icon !== undefined) {
         this.typeIconList.push({
           uid: this.typeForm.id,
-          url: this.minio+this.typeForm.icon,
+          url: this.minio + this.typeForm.icon,
           name: 'image' + 1,
           status: 'done'
         })
       }
     },
-    //添加分类
+    openDrawer(val) {
+      this.visible = true
+      this.addIconList = []
+      if (val === 1) {
+        this.addTitle = '新增顶级分类'
+      } else {
+        this.addTitle = '新增子级分类'
+        this.visibleChild = true
+        this.addForm.parentId = this.typeForm.id
+      }
+    },
+    //确认添加分类
     addType() {
+      console.log(this.addForm)
       this.$refs['typeRuleForm'].validate(val => {
         if (val) {
           if (this.addForm.icon.length < 1) {
@@ -290,7 +303,7 @@ export default {
         parentId: undefined,
         parentName: undefined
       }
-      this.typeIconList=[]
+      this.typeIconList = []
       this.$refs['typeRuleForm'].resetFields()
     },
     //初始化
