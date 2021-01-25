@@ -8,7 +8,8 @@ import router from './router'
 import store from './store'
 
 Vue.config.productionTip = false
-
+import globalParam from './utils/global'
+Vue.prototype.minio = globalParam.minio;
 Vue.prototype.$message = message
 message.config({
   duration: 2,// 持续时间
