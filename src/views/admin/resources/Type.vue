@@ -72,7 +72,7 @@
                     :multiple="false"
                     @change="handleUploadIcon"
                     accept="image/*"
-                    action="http://localhost:8099/minio/"
+                    :action="basic+'/minio/'"
                     list-type="picture-card"
                     name="file"
                   >
@@ -219,7 +219,7 @@ export default {
       if (this.typeForm.icon !== undefined) {
         this.typeIconList.push({
           uid: this.typeForm.id,
-          url: this.typeForm.icon,
+          url: this.minio+this.typeForm.icon,
           name: 'image' + 1,
           status: 'done'
         })
