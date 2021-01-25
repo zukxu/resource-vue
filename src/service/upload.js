@@ -15,7 +15,7 @@ export function addFile(entity) {
 // 删除
 export function delFileByName(fileName) {
   upload.delType.params = {
-    fileName: id
+    fileName: fileName
   }
   return request(upload.delFileByName)
 }

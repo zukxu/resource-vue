@@ -4,9 +4,11 @@
       <a-row>
         <!--分类树-->
         <a-col :span="10">
-          <a-tree :replaceFields="replaceFields" :tree-data="typeList" @click="onCheck"/>
+          <a-tree :replaceFields="replaceFields" :show-icon=true :tree-data="typeList" @select="onSelect">
+            <a-icon slot="icon" type="tags"/>
+          </a-tree>
         </a-col>
-        <!--详细-->
+        <!--按钮组-->
         <a-col :span="12">
           <a-space>
             <a-space>
@@ -14,7 +16,7 @@
                 新增顶级分类
               </a-button>
               <a-button
-                @click=";(visibleTow = true), (fileListBig = []), (typeIconList = [])"
+                @click=";(visibleTow = true),(typeIconList = [])"
                 type="primary"
                 v-if="typeForm.id"
               >
@@ -32,10 +34,11 @@
               </a-popconfirm>
             </a-space>
           </a-space>
+          <!--表单详情-->
           <a-form-model :model="typeForm" :rules="typeRules" ref="typeRuleForm">
             <a-row>
               <a-col :span="12">
-                <a-form-model-item label="分类名称" prop="label">
+                <a-form-model-item label="分类名称" prop="title">
                   <a-input :disabled="disabled" placeholder="请输入分类名称" v-model="typeForm.typeName"/>
                 </a-form-model-item>
               </a-col>
@@ -60,7 +63,7 @@
                     :multiple="false"
                     @change="handleUploadIcon"
                     accept="image/*"
-                    action="/minio/"
+                    action="http://localhost:8099/minio/"
                     list-type="picture-card"
                     name="file"
                   >
@@ -68,7 +71,7 @@
                     <div v-if="typeIconList.length < 1">
                       <a-icon type="plus"/>
                       <div class="ant-upload-text">
-                        上传小图标
+                        上传图标
                       </div>
                     </div>
                   </a-upload>
@@ -97,8 +100,8 @@
         <a-form-model :model="addForm" :rules="typeRules" ref="typeRuleForm">
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-model-item label="分类名称" prop="label">
-                <a-input placeholder="请输入分类名称" v-model.trim="addForm.label"/>
+              <a-form-model-item label="分类名称" prop="typeName">
+                <a-input placeholder="请输入分类名称" v-model.trim="addForm.typeName"/>
               </a-form-model-item>
             </a-col>
           </a-row>
@@ -162,8 +165,8 @@
         <a-form-model :model="addForm" :rules="typeRules" ref="typeRuleForm">
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-model-item label="分类名称" prop="label">
-                <a-input placeholder="请输入分类名称" v-model="addForm.label"/>
+              <a-form-model-item label="分类名称" prop="typeName">
+                <a-input placeholder="请输入分类名称" v-model="addForm.typeName"/>
               </a-form-model-item>
             </a-col>
           </a-row>
@@ -220,7 +223,7 @@
   </div>
 </template>
 <script>
-import {addType, delType, getTypeById, listType, updType} from '@/service/type'
+import {addType, delType, listType, updType} from '@/service/type'
 
 export default {
   data() {
@@ -230,7 +233,6 @@ export default {
       replaceFields: {children: 'children', title: 'typeName', key: 'id'},
       //图标上传列表
       typeIconList: [],
-      ziyuan: {},
       typeForm: {
         id: undefined,
         typeName: undefined,
@@ -246,18 +248,13 @@ export default {
       disabled: true,
       pageLoading: true,
       visible: false,
-      visibleTow: false,
-      banOnSubmit: false,
-      typeListTow: [],
       typeRules: {
-        label: [
+        title: [
           {required: true, message: '请输入分类名称', trigger: 'blur'},
           {required: true, max: 5, message: '最大长度为5', trigger: 'blur'}
         ],
         sort: [{required: true, message: '请输入分类排序', trigger: 'blur'}]
       },
-      eventKey: undefined,
-      copyClickData: {},
     }
   },
   created() {
@@ -294,41 +291,16 @@ export default {
       })
     },
     //选中查看详情
-    onCheck(checkedKeys, info) {
-      this.typeForm = info.dataRef
-      /*if (this.typeForm.icon === undefined) {
-        this.typeIconList.push(this.ziyuan)
-      }*/
+    onSelect(checkedKeys, info) {
+      console.log(checkedKeys)
+      console.log(info)
+      console.log(info.node.dataRef)
+      this.typeForm = JSON.parse(JSON.stringify(info.node.dataRef))
+      //重新置空
       this.typeIconList = []
+      this.typeIconList.push(this.typeForm.icon)
       console.log(this.typeForm)
-      getTypeById({id: this.typeForm.id}).then(res => {
-        if (res.status == 1) {
-          this.typeForm.sort = res.data.sort
-          const smallImgUrl = this.router + res.data.img
-          var smallUrl = new Image()
-          smallUrl.src = smallImgUrl
-          if (res.data.img) {
-            this.typeIconList.push({
-              uid: -1,
-              url: smallImgUrl,
-              name: 'image' + 1,
-              status: 'done'
-            })
-          }
-          const bigIconUrl = this.router + res.data.icon
-          if (res.data.icon) {
-            var ImgObj = new Image()
-            ImgObj.src = bigIconUrl
-            this.fileListBig.push({
-              uid: -1,
-              url: bigIconUrl,
-              name: 'image' + 1,
-              status: 'done'
-            })
-          }
-          console.log('当前选择的值的ID的详情', this.typeIconList)
-        }
-      })
+      console.log(this.typeIconList)
     },
     //添加新的子集
     addTypeTow() {
@@ -342,7 +314,6 @@ export default {
               this.onClose()
               this.listType()
 
-              // this.onLoadData(this.copyClickData)
             } else if (res.status === 2) {
               this.$message.success(res.msg)
             } else {
@@ -375,6 +346,7 @@ export default {
     updType() {
       this.$refs.typeRuleForm.validate(val => {
         if (val) {
+          console.log(this.typeForm)
           updType(this.typeForm).then(res => {
             if (res.status === 1) {
               this.$message.success('修改成功')
@@ -391,25 +363,22 @@ export default {
     //关闭drawer
     onClose() {
       this.visible = false
-      this.visibleTow = false
       this.disabled = true
       this.typeForm = {
         id: undefined,
-        label: undefined
+        typeName: undefined
       }
       this.addForm = {
-        label: undefined,
+        typeName: undefined,
         parentId: undefined
       }
     },
     //初始化
     listType() {
-      listType()
-        .then(res => {
-          this.typeList = res.data.data.records
-          console.log('父菜单的数据', this.typeList)
-          this.pageLoading = false
-        })
+      listType().then(res => {
+        this.typeList = res.data.data.records
+        this.pageLoading = false
+      })
         .catch(() => {
           this.$message.error('请求失败')
         })
