@@ -1,10 +1,12 @@
-import request from '@/utils/request'
 import type from '@/service/api/typeAPI'
+import request from '@/utils/request'
 
-// 获取详细信息【get 请求】
-export function getTypeById(params) {
-  type.getTypeById.params = params
-  return request(type.getTypeById)
+// 获取子级详细信息【get 请求】
+export function getChildById(id) {
+  type.getChildById.params = {
+    id: id
+  }
+  return request(type.getChildById)
 }
 
 // 获取详细列表信息【get 请求】

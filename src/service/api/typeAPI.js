@@ -5,10 +5,10 @@ const TYPE_API = {
     url: '/type/list',
     params: ''
   },
-  //获取分类
-  getTypeById: {
+  //获取子级分类
+  getChildById: {
     method: 'get',
-    url: '/type',
+    url: '/type/getChildType',
     params: ''
   },
   //新增分类 form-data,application/json
