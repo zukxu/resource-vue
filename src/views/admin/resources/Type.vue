@@ -17,18 +17,9 @@
           <!--按钮组-->
           <a-space>
             <a-space>
-              <a-button @click="openDrawer(1)" type="primary">
-                新增顶级分类
+              <a-button @click="openDrawer" type="primary">
+                新增分类
               </a-button>
-              <a-button
-                @click="openDrawer(2)"
-                type="primary"
-                v-if="typeForm.id"
-              >
-                新增子级分类
-              </a-button>
-            </a-space>
-            <a-space>
               <a-button @click="disabled = false" type="primary" v-if="typeForm.id">
                 修改
               </a-button>
@@ -96,18 +87,15 @@
           </a-form-model>
         </a-col>
       </a-row>
-      <!--新增顶级分类-->
+      <!--新增分类-->
       <a-drawer
         :body-style="{ paddingBottom: '80px' }"
-        :title="addTitle"
         :visible="visible"
         :width="420"
         @close="onClose"
+        title="新增分类"
       >
         <a-form-model :model="addForm" :rules="typeRules" ref="typeRuleForm">
-          <a-form-model-item label="父分类名称" v-if="visibleChild">
-            <a-input disabled v-model.trim="addForm.parentName"/>
-          </a-form-model-item>
           <a-form-model-item label="分类名称" prop="typeName">
             <a-input placeholder="请输入分类名称" v-model.trim="addForm.typeName"/>
           </a-form-model-item>
@@ -252,7 +240,6 @@ export default {
 
     //选中查看详情
     onSelect(checkedKeys, info) {
-      console.log(checkedKeys[0])
       this.disabled = true
       this.typeForm = JSON.parse(JSON.stringify(info.node.dataRef))
       this.addForm.parentName = this.typeForm.typeName
@@ -267,16 +254,9 @@ export default {
         })
       }
     },
-    openDrawer(val) {
+    openDrawer() {
       this.visible = true
       this.addIconList = []
-      if (val === 1) {
-        this.addTitle = '新增顶级分类'
-      } else {
-        this.addTitle = '新增子级分类'
-        this.visibleChild = true
-        this.addForm.parentId = this.typeForm.id
-      }
     },
     //确认添加分类
     addType() {
