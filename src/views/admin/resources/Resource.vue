@@ -1,5 +1,6 @@
 <template>
   <div id="Resource">
+    <!--筛选-->
     <a-card>
       <template slot="title">
         <a-icon type="search"/>
@@ -35,6 +36,7 @@
         </a-form>
       </div>
     </a-card>
+    <!--表格-->
     <a-table :columns="columns" :data-source="dataList" :loading="loading" :pagination="false"
              :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" :rowKey="record=>record.id"
              :scroll="{ x: 960, y: 480 }"
@@ -46,6 +48,7 @@
         资源列表
         <a-button @click="addNew" style="float: right" type="primary">添加</a-button>
       </template>
+      <!--批量-->
       <template slot="footer">
         <a-row justify="space-around" type="flex">
           <a-col span="6">
@@ -97,20 +100,30 @@
         </a-tooltip>
       </span>
       <span slot="action" slot-scope="record">
-        <a-space>
-      <a-button @click="update(record)">编辑</a-button>
-        <a-popconfirm
-          @cancel="cancel"
-          @confirm="confirmDel(record.id)"
-          cancel-text="取消"
-          ok-text="确认"
-          title="确定要删除吗?"
-        >
+         <a-dropdown :trigger="['click']" placement="bottomCenter">
+        <a-button>更多操作</a-button>
+        <a-menu slot="overlay">
+          <a-menu-item>
+            <a-button @click="update(record)">编辑</a-button>
+          </a-menu-item>
+          <a-menu-item>
+       <a-button @click="details(record)" type="primary">详情</a-button>
+          </a-menu-item>
+          <a-menu-item>
+            <a-popconfirm
+              @confirm="confirmDel(record.id)"
+              cancel-text="取消"
+              ok-text="确认"
+              title="确定要删除吗?"
+            >
           <a-button type="danger">删除</a-button>
         </a-popconfirm>
-      </a-space>
+          </a-menu-item>
+        </a-menu>
+      </a-dropdown>
     </span>
     </a-table>
+    <!--添加-->
     <AddResource :isShow="isShow"
                  :resource="tempData"
                  :title="title"
@@ -118,6 +131,31 @@
                  @callBackUpdateForm="callBackUpdateForm"
                  ref="addChild">
     </AddResource>
+    <!--详情-->
+    <a-drawer :closable="false" :visible="visible" @close="onClose" placement="right" width="640">
+      <a-descriptions
+        :column="{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }"
+        bordered
+        layout="vertical"
+        title="查看详情"
+      >
+        <a-descriptions-item label="资源名称">
+          {{tempData.name}}
+        </a-descriptions-item>
+        <a-descriptions-item label="资源分类">
+          {{tempData.typeName}}
+        </a-descriptions-item>
+        <a-descriptions-item label="添加时间">
+          {{tempData.createTime}}
+        </a-descriptions-item>
+        <a-descriptions-item label="备注">
+          {{tempData.remark}}
+        </a-descriptions-item>
+        <a-descriptions-item label="资源地址">
+          {{tempData.content}}
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-drawer>
   </div>
 </template>
 
@@ -182,7 +220,7 @@ export default {
       selectedRowKeys: [],//选中行
       loading: false,//加载
       isShow: false,//显示
-
+      visible: false,
       //查询参数
       page: {
         current: 1,
@@ -259,9 +297,15 @@ export default {
         this.$message.error('删除异常' + e)
       })
     },
-    cancel(e) {
+    //查看详情
+    details(e) {
       console.log(e)
-      this.$message.warn('取消删除！')
+      this.tempData = e
+      this.visible = true
+    },
+    onClose() {
+      this.tempData = {}
+      this.visible = false
     },
     //每页显示多少条数据
     pageSizeChange(current, pageSize) {
