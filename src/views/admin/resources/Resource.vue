@@ -215,6 +215,7 @@ export default {
     listInfo() {
       this.loading = true
       listRes(this.page).then((res) => {
+        console.log(res.data.data.records)
         if (res.data.code !== 1) {
           this.$message.error('数据异常')
           return
@@ -231,7 +232,8 @@ export default {
     //分类查询
     typeInfo() {
       listType().then((res) => {
-        const result = res.data.data.records
+        console.log(res)
+        const result = res.data.data
         result.forEach((r) => {
           this.typeList.push({
             value: String(r.id),
