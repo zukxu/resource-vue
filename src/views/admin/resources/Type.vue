@@ -194,10 +194,14 @@ export default {
     //修改
     handleUpdIcon({file, fileList}) {
       this.typeIconList = fileList
+      console.log(file)
       if (file.status === 'done') {
         //获取上传完成返回的对象名
         console.log(file)
         this.typeForm.icon = file.response.data.url
+      }
+      if (file.status === 'removed') {
+        this.typeForm.icon = undefined
       }
     },
     //上传
@@ -207,6 +211,9 @@ export default {
         //获取上传完成返回的对象名
         console.log(file)
         this.addForm.icon = file.response.data.url
+      }
+      if (file.status === 'removed') {
+        this.addForm.icon = undefined
       }
     },
 
@@ -241,11 +248,13 @@ export default {
     addType() {
       console.log(this.addForm)
       this.$refs['typeRuleForm'].validate(val => {
+        console.log(val)
         if (val) {
           if (this.addForm.icon.length < 1) {
             this.addForm.icon = undefined
           }
           addType(this.addForm).then(res => {
+            console.log(res.data)
             if (res.data.code === 1) {
               this.$message.success('添加成功')
               this.pageLoading = true
