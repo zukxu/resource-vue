@@ -4,13 +4,17 @@
       <a-row>
         <!--分类树-->
         <a-col :span="10">
-          <a-tree :replaceFields="replaceFields" :tree-data="typeList"
-                  @select="onSelect">
-            <a-icon slot="icon" type="tags"/>
+          <a-tree
+            :replaceFields="replaceFields"
+            :tree-data="typeList"
+            @select="onSelect"
+            defaultExpandAll
+            show-icon>
+            <a-icon slot="switchIcon" type="tags"/>
           </a-tree>
         </a-col>
-        <!--按钮组-->
         <a-col :span="12">
+          <!--按钮组-->
           <a-space>
             <a-space>
               <a-button @click="openDrawer(1)" type="primary">
@@ -50,6 +54,7 @@
                   <a-input-number
                     :disabled="disabled"
                     :min=0
+                    :style="{width:'100%'}"
                     placeholder="请输入分类排序"
                     v-model.trim="typeForm.sort"
                   />
@@ -65,11 +70,11 @@
                     :file-list="typeIconList"
                     :multiple="false"
                     @change="handleUpdIcon"
+                    @preview="handlePreview"
                     accept="image/*"
                     list-type="picture-card"
                     name="file"
                   >
-                    <!--@preview="handlePreview"-->
                     <div v-if="typeIconList.length < 1">
                       <a-icon type="plus"/>
                       <div class="ant-upload-text">
@@ -91,7 +96,7 @@
           </a-form-model>
         </a-col>
       </a-row>
-      <!--顶级分类-->
+      <!--新增顶级分类-->
       <a-drawer
         :body-style="{ paddingBottom: '80px' }"
         :title="addTitle"
@@ -114,6 +119,7 @@
               :action="basic+'/minio/'"
               :file-list="addIconList"
               @change="handleAddIcon"
+              @preview="handlePreview"
               list-type="picture-card"
               name="file"
             >
@@ -147,10 +153,23 @@
         </a-form-model>
       </a-drawer>
     </a-card>
+    <!--预览-->
+    <a-modal :footer="null" :visible="previewVisible" @cancel="handleCancel">
+      <img :src="previewImage" alt="预览" style="width: 100%"/>
+    </a-modal>
   </div>
 </template>
 <script>
 import {addType, delType, listType, updType} from '@/service/type'
+
+function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = error => reject(error)
+  })
+}
 
 export default {
   data() {
@@ -161,11 +180,14 @@ export default {
       //图标上传列表
       typeIconList: [],
       addIconList: [],
+      previewVisible: false,
+      previewImage: '',
+
       typeForm: {
         id: undefined,
         typeName: undefined,
         sort: '',
-        icon: ''
+        pics: ''
       },
       addForm: {
         id: undefined,
@@ -173,7 +195,7 @@ export default {
         parentId: undefined,
         parentName: undefined,
         sort: '',
-        icon: ''
+        pics: ''
       },
       disabled: true,
       pageLoading: true,
@@ -198,10 +220,10 @@ export default {
       if (file.status === 'done') {
         //获取上传完成返回的对象名
         console.log(file)
-        this.typeForm.icon = file.response.data.url
+        this.typeForm.pics = file.response.data.url
       }
       if (file.status === 'removed') {
-        this.typeForm.icon = undefined
+        this.typeForm.pics = undefined
       }
     },
     //上传
@@ -210,24 +232,36 @@ export default {
       if (file.status === 'done') {
         //获取上传完成返回的对象名
         console.log(file)
-        this.addForm.icon = file.response.data.url
+        this.addForm.pics = file.response.data.url
       }
       if (file.status === 'removed') {
-        this.addForm.icon = undefined
+        this.addForm.pics = undefined
       }
+    },
+    handleCancel() {
+      this.previewVisible = false
+    },
+    async handlePreview(file) {
+      console.log(file)
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj)
+      }
+      this.previewImage = file.url || file.preview
+      this.previewVisible = true
     },
 
     //选中查看详情
     onSelect(checkedKeys, info) {
+      console.log(checkedKeys[0])
       this.disabled = true
       this.typeForm = JSON.parse(JSON.stringify(info.node.dataRef))
       this.addForm.parentName = this.typeForm.typeName
       //重新置空
       this.typeIconList = []
-      if (this.typeForm.icon !== undefined) {
+      if (this.typeForm.pics !== undefined) {
         this.typeIconList.push({
           uid: this.typeForm.id,
-          url: this.minio + this.typeForm.icon,
+          url: this.minio + this.typeForm.pics,
           name: 'image' + 1,
           status: 'done'
         })
@@ -250,8 +284,8 @@ export default {
       this.$refs['typeRuleForm'].validate(val => {
         console.log(val)
         if (val) {
-          if (this.addForm.icon.length < 1) {
-            this.addForm.icon = undefined
+          if (this.addForm.pics.length < 1) {
+            this.addForm.pics = undefined
           }
           addType(this.addForm).then(res => {
             console.log(res.data)
@@ -318,12 +352,23 @@ export default {
     //初始化
     listType() {
       listType().then(res => {
-        this.typeList = res.data.data
+        let list = res.data.data
+        this.typeList = this.setIcon(list)
         this.pageLoading = false
+      }).catch(() => {
+        this.$message.error('请求失败')
       })
-        .catch(() => {
-          this.$message.error('请求失败')
-        })
+    },
+
+    setIcon(dataArray) {
+      let res = []
+      dataArray.forEach(item => {
+        item.scopedSlots = {icon: 'switchIcon'}
+        res.push(item)
+        if (!item.children || !item.children.length) return
+        this.setIcon(item.children)
+      })
+      return res
     },
   }
 }

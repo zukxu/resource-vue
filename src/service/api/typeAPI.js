@@ -11,6 +11,12 @@ const TYPE_API = {
     url: '/type/getChildType',
     params: ''
   },
+  //根据分类id获取详情
+  getDetailsById: {
+    method: 'get',
+    url: '/type/getDetailsById',
+    params: ''
+  },
   //新增分类 form-data,application/json
   addType: {
     method: 'post',
