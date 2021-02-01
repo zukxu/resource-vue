@@ -46,7 +46,7 @@
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
-    <a-layout id="components-layout-fixed">
+    <a-layout>
       <a-layout-header :style="{background: '#ffffff', padding:0 }">
         <span class="global-header-trigger">
         <a-icon
@@ -65,7 +65,7 @@
         </div>
       </a-layout-header>
       <a-layout-content
-        :style="{ margin: '24px 16px', padding: '24px', background: '#ffffff', minHeight: '610px' }"
+        :style="{ margin: '24px 16px', padding: '24px', background: '#ffffff'}"
       >
         <router-view v-wechat-title='$route.meta.title'></router-view>
       </a-layout-content>
@@ -83,7 +83,6 @@ export default {
 </script>
 <style lang="less" scoped>
 #BaseLayout{
-
   min-height: 100%;
 
   .global-header-trigger{
