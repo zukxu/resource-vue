@@ -92,7 +92,7 @@
         </a-tooltip>
       </span>
       <span slot="tags" slot-scope="text">
-        <a-tag color="#2db7f5">{{text}}</a-tag>
+        <a-tag :color="randomColor[Math.floor(Math.random()*10)]">{{text}}</a-tag>
       </span>
       <span slot="remark" slot-scope="text">
         <a-tooltip :title="text" placement="topLeft">
@@ -172,6 +172,7 @@ const columns = [
     title: '资源名称',
     dataIndex: 'name',
     width: 150,
+    ellipsis: true,
     scopedSlots: {customRender: 'names'}
   },
   {
@@ -245,7 +246,8 @@ export default {
           text: '批量审核',
         }
       ],
-      batchParam: undefined//批量操作参数
+      batchParam: undefined,//批量操作参数
+      randomColor:['pink','red','orange','green','cyan','blue','purple','#f50','#2db7f5','#9F2218']
     }
   },
   methods: {
