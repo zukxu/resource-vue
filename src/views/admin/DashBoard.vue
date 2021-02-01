@@ -1,12 +1,12 @@
 <template>
-  <div id="Affair">
+  <div id="DashBoard">
 
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Affair',
+  name: 'DashBoard',
   props: {},
   components: {},
   created() {
@@ -19,7 +19,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-#Affair{
+#DashBoard{
 
 }
 </style>

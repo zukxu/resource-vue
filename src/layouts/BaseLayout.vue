@@ -3,9 +3,20 @@
     <a-layout-sider :trigger="null" breakpoint="lg" v-model="collapsed">
       <div class="logo"/>
       <a-menu
-        :default-open-keys="['resourceMgr']"
+        :default-open-keys="['dashboard']"
         :default-selected-keys="[$route.path]"
         mode="inline" theme="dark">
+        <a-sub-menu key="dashboard">
+          <div slot="title">
+            <a-icon type="unordered-list"/>
+            <span>DASHBOARD</span>
+          </div>
+          <a-menu-item key="/dash">
+            <router-link to="/dash">
+              <span>DashBoard</span>
+            </router-link>
+          </a-menu-item>
+        </a-sub-menu>
         <a-sub-menu key="resourceMgr">
           <div slot="title">
             <a-icon type="unordered-list"/>
@@ -19,11 +30,6 @@
           <a-menu-item key="/type">
             <router-link to="/type">
               <span>分类管理</span>
-            </router-link>
-          </a-menu-item>
-          <a-menu-item key="/affair">
-            <router-link to="/affair">
-              <span>事务管理</span>
             </router-link>
           </a-menu-item>
         </a-sub-menu>
@@ -40,8 +46,8 @@
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
-    <a-layout>
-      <a-layout-header  :style="{background: '#ffffff', padding:0 }" >
+    <a-layout id="components-layout-fixed">
+      <a-layout-header :style="{background: '#ffffff', padding:0 }">
         <span class="global-header-trigger">
         <a-icon
           :type="collapsed ? 'menu-unfold' : 'menu-fold'"
@@ -77,6 +83,9 @@ export default {
 </script>
 <style lang="less" scoped>
 #BaseLayout{
+
+  min-height: 100%;
+
   .global-header-trigger{
     height: 64px;
     font-size: 20px;

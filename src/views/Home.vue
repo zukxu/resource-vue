@@ -3,14 +3,15 @@
     <a-list :data-source="dataList" :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3 }">
       <a-list-item slot="renderItem" slot-scope="item, index">
         <a-card :key="index" :title="item.name">
-          Card content
+          {{item.content}}
+          {{item.remark}}
         </a-card>
       </a-list-item>
     </a-list>
     <div class="pagination-local">
       <a-pagination
         :page-size="page.size"
-        :show-total="(total, range) => `${range[0]}-${range[1]} of ${total} 数据`"
+        :show-total="(total, range) => `第${range[0]}-${range[1]} 条数据  共 ${total} 条数据`"
         :total="page.total"
         @change="pageCurrentChange"
         @showSizeChange="pageSizeChange"

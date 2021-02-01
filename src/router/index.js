@@ -20,11 +20,19 @@ const routes = [
     name: 'layout',
     component: () => import('@/layouts/BaseLayout'),
     //TODO 没有登录，直接重定向到资源页面
-    redirect: '/resource',
+    redirect: '/dash',
     meta: {
       title: ' 资源管理系统'   // 标题设置
     },
     children: [
+      {
+        path: '/dash',
+        name: 'dash',
+        component: () => import('@/views/admin/DashBoard'),
+        meta: {
+          title: '首页'
+        }
+      },
       {
         path: '/resource',
         name: 'resource',
@@ -38,13 +46,6 @@ const routes = [
         component: () => import('@/views/admin/resources/Type'),
         meta: {
           title: '分类管理'
-        }
-      },{
-        path: '/affair',
-        name: 'affair',
-        component: () => import('@/views/admin/resources/Affair'),
-        meta: {
-          title: '事务管理'
         }
       }, {
         path: '/upload',
