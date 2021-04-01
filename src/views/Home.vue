@@ -1,47 +1,14 @@
 <template>
-  <div id="Home">
+  <div id="Home" ref="container">
     <a-list :data-source="dataList" :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3 }">
       <a-list-item slot="renderItem" slot-scope="item, index">
         <a-card :key="index" :title="item.name">
+          <span style="color: red">{{ index + 1 }}</span>
           {{ item.content }}
           {{ item.remark }}
         </a-card>
       </a-list-item>
     </a-list>
-    <a-affix :offsetBottom="120">
-      <a-button :style="{float:'right'}" @click="gotoTop">回到顶部</a-button>
-    </a-affix>
-<!--    <div class="item tool-coderunner">
-      <div class="item-inner">
-        <div class="item-hd">
-          <a target="_blank" href="https://tool.lu/coderunner/" class="item-icon"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="48" height="48" alt="coderunner"></a>
-          <h3><a target="_blank" href="https://tool.lu/coderunner/">在线运行代码</a></h3>
-
-          <span class="item-category">[<a target="_blank" rel="nofollow" href="/c/developer">开发类</a>]</span>
-          <a title="收藏" class="collectable collect" href="javascript:;" data-slug="coderunner" data-url="https://tool.lu/collect.html"><i class="icon collect"></i><var>加入收藏</var></a>
-        </div>
-        <div class="item-bd">
-          <div class="item-desc" title="在线运行php,c,c++,go,python,java,groovy代码">在线运行php,c,c++,go,python,java,groovy代码</div>
-        </div>
-        <div class="item-ft">
-          <a target="_blank" class="item-link" href="https://tool.lu/coderunner/">https://tool.lu/coderunner/</a>
-          <a target="_blank" class="item-btn" href="https://tool.lu/coderunner/">进入</a>
-        </div>
-
-      </div>
-    </div>-->
-    <!--    <div class="pagination-local">
-          <a-pagination
-            :page-size="page.size"
-            :show-total="(total, range) => `第${range[0]}-${range[1]} 条数据  共 ${total} 条数据`"
-            :total="page.total"
-            @change="pageCurrentChange"
-            @showSizeChange="pageSizeChange"
-            show-size-changer
-            v-model="page.current"
-          >
-          </a-pagination>
-        </div>-->
   </div>
 </template>
 <script>
@@ -60,33 +27,42 @@ export default {
         fields: '',
         total: 10
       },
-      allPage: 0
+      allPage: 0,
+      lineHeight: 0, //参考线位置。即判断滚动到何处触发事件；
+      scrollHeight: 0,//页面卷入的高度
+      windowHeight: 0//浏览器窗口的高度
     }
   },
   created() {
     this.listInfo()
   },
   mounted() {
-    this.$nextTick(function () {
+    console.log(33333333333)
+    /*this.$nextTick(function () {
       window.addEventListener('scroll', this.lazyLoad());
-    })
-
+    })*/
   },
 
   methods: {
     listInfo() {
+      console.log(2222222222)
       this.loading = true
       listRes(this.page).then((res) => {
-            console.log(res)
+            console.log(res.data.data)
             if (res.data.code !== 1) {
               this.$message.error('请求异常')
               return
             }
             const data = res.data.data
             this.page.total = data.total
+            this.allPage = data.pages
+            console.log(this.allPage)
             this.tempList = data.records
             this.dataList = this.dataList.concat(this.tempList)
-            this.allPage = this.page.total / this.page.size + 1
+            this.lineHeight = this.getLineHeight()
+            console.log('参考线，文档内容高度',this.lineHeight)
+            console.log('窗口高度',this.getClientHeight())
+            console.log('滚动条高度',this.getScrollHeight())
             this.loading = false
           }
       )
@@ -103,7 +79,7 @@ export default {
     },
 
     // 获取滚动条当前的位置
-    getScrollTop() {
+    getScrollHeight() {
       let scrollTop = 0
       if (document.documentElement && document.documentElement.scrollTop) {
         scrollTop = document.documentElement.scrollTop
@@ -122,22 +98,27 @@ export default {
       }
       return clientHeight
     },
-    // 获取文档完整的高度
-    getScrollHeight() {
+    // 获取参考线/文档完整的高度
+    getLineHeight() {
       return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
     },
     // 滚动事件触发下拉加载
     lazyLoad() {
       if (this.getScrollHeight() - this.getClientHeight() - this.getScrollTop() <= 0) {
+        console.log(11111111111)
+        console.log(this.page)
+        console.log(Math.ceil(this.page.total / this.page.size))
+        console.log(this.allPage)
         if (this.page.current <= this.allPage) {
           this.page.current++;
+          console.log(this.page)
           this.listInfo()
         } else {
           this.$message.warn('没有更多内容了！！！');
         }
       }
     },
-    gotoTop(){
+    gotoTop() {
       console.log('回到顶部')
     }
   }
