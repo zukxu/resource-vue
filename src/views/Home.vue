@@ -77,7 +77,10 @@ export default {
       this.page.current = current
       this.listInfo()
     },
-
+    // 获取参考线/文档完整的高度
+    getLineHeight() {
+      return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+    },
     // 获取滚动条当前的位置
     getScrollHeight() {
       let scrollTop = 0
@@ -98,10 +101,7 @@ export default {
       }
       return clientHeight
     },
-    // 获取参考线/文档完整的高度
-    getLineHeight() {
-      return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-    },
+
     // 滚动事件触发下拉加载
     lazyLoad() {
       if (this.getScrollHeight() - this.getClientHeight() - this.getScrollTop() <= 0) {
