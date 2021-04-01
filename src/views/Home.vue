@@ -9,16 +9,15 @@
         </a-card>
       </a-list-item>
     </a-list>
-    <div v-show="isShowGoTop" :style="{position:'fixed',right:'50px',bottom:'120px'}">
-      <a-tooltip placement="topRight">
-        <template slot="title">
-          <span>返回顶部</span>
-        </template>
-        <a-button type="primary" @click="goTop">
-          <a-icon theme="filled" type="caret-up"/>
-        </a-button>
-      </a-tooltip>
-
+    <a-divider>第{{ page.current - 1 }}页/共{{ page.total }}条数据</a-divider>
+    <div class="loadMore">
+      <a-button type="primary" @click="loadMore">
+        <a-icon type="more"/>
+        加载更多
+      </a-button>
+    </div>
+    <div>
+      <a-back-top/>
     </div>
   </div>
 </template>
@@ -38,98 +37,41 @@ export default {
         fields: '',
         total: 10
       },
-      isRefreshBool: true,
-      isShowGoTop: false
+      hasMore: false
     }
   },
   created() {
     this.listInfo()
-  },
-  mounted() {
-    this.$nextTick(function () {
-      window.addEventListener('scroll', this.isRefresh, true);
-    })
   },
 
   methods: {
     listInfo() {
       this.loading = true
       listRes(this.page).then((res) => {
-            console.log(res.data.data)
             if (res.data.code !== 1) {
               this.$message.error('请求异常')
               return
             }
             const data = res.data.data
             this.page.total = data.total;
-            this.page.current++
-            this.isRefreshBool = true
-            if (data.records) {
+            this.hasMore = false
+            if (data.records && data.records.length > 0) {
               this.tempList = data.records
               this.dataList = this.dataList.concat(this.tempList)
+              this.page.current++
+              this.hasMore = true
             }
-            this.loading = false
+            this.loading = false;
           }
       )
     },
-    pageSizeChange(current, pageSize) {
-      console.log(current, pageSize)
-      this.page.size = pageSize
-      this.listInfo()
-    },
-    pageCurrentChange(current, pageSize) {
-      console.log(current, pageSize)
-      this.page.current = current
-      this.listInfo()
-    },
-    // 获取当前可视范围的高度
-    getWindowHeight() {
-      let clientHeight = 0
-      if (document.body.clientHeight && document.documentElement.clientHeight) {
-        clientHeight = Math.min(document.body.clientHeight, document.documentElement.clientHeight)
+    loadMore() {
+      if (this.hasMore) {
+        this.listInfo();
       } else {
-        clientHeight = Math.max(document.body.clientHeight, document.documentElement.clientHeight)
-      }
-      return clientHeight
-    },
-    // 获取滚动条/文档所有的高度
-    getScrollHeight() {
-      return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-    },
-    // 获取滚动条当前的位置,即滚动条距离顶部的距离
-    getScrollTop() {
-      let scrollTop = 0
-      if (document.documentElement && document.documentElement.scrollTop) {
-        scrollTop = document.documentElement.scrollTop
-      } else if (document.body) {
-        scrollTop = document.body.scrollTop
-      }
-      return scrollTop
-    },
-    isRefresh() {
-      //变量scrollTop是滚动条滚动时，距离顶部的距离
-      let scrollTop = this.getScrollTop()
-      //变量windowHeight是可视区的高度
-      let windowHeight = this.getWindowHeight()
-      //变量scrollHeight是滚动条的总高度
-      let scrollHeight = this.getScrollHeight()
-      //滚动条到底部的条件
-      let yOffset = window.pageYOffset
-      this.isShowGoTop = yOffset > windowHeight;
-      if (scrollTop + windowHeight >= scrollHeight - 200) {
-        if (this.isRefreshBool && this.page.current < 4) {
-          // false防止加载数据函数多次触发
-          this.isRefreshBool = false;
-          this.listInfo();
-        } else {
-          this.$message.warn('没有更多数据了!!!')
-        }
+        this.$message.warn('没有更多数据了!')
       }
     },
-    goTop() {
-      console.log('回到顶部')
-      // $('body,html').animate({scrollTop:0},1500);
-    }
   }
 }
 </script>
@@ -140,6 +82,10 @@ export default {
   .pagination-local {
     left: 25%;
     top: 35px;
+  }
+
+  .loadMore {
+    text-align: center;
   }
 }
 </style>
