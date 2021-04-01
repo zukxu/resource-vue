@@ -9,6 +9,9 @@
         </a-card>
       </a-list-item>
     </a-list>
+    <a-affix :offset-top="120" @change="change">
+      <a-button>返回顶部</a-button>
+    </a-affix>
   </div>
 </template>
 <script>
@@ -27,25 +30,20 @@ export default {
         fields: '',
         total: 10
       },
-      allPage: 0,
-      lineHeight: 0, //参考线位置。即判断滚动到何处触发事件；
-      scrollHeight: 0,//页面卷入的高度
-      windowHeight: 0//浏览器窗口的高度
+      isRefreshBool: true
     }
   },
   created() {
     this.listInfo()
   },
   mounted() {
-    console.log(33333333333)
-    /*this.$nextTick(function () {
-      window.addEventListener('scroll', this.lazyLoad());
-    })*/
+    this.$nextTick(function () {
+      window.addEventListener('scroll', this.isRefresh, true);
+    })
   },
 
   methods: {
     listInfo() {
-      console.log(2222222222)
       this.loading = true
       listRes(this.page).then((res) => {
             console.log(res.data.data)
@@ -54,15 +52,15 @@ export default {
               return
             }
             const data = res.data.data
-            this.page.total = data.total
-            this.allPage = data.pages
-            console.log(this.allPage)
-            this.tempList = data.records
-            this.dataList = this.dataList.concat(this.tempList)
-            this.lineHeight = this.getLineHeight()
-            console.log('参考线，文档内容高度',this.lineHeight)
-            console.log('窗口高度',this.getClientHeight())
-            console.log('滚动条高度',this.getScrollHeight())
+              this.page.total = data.total;
+              this.page.current++
+              this.isRefreshBool = true
+            if (data.records) {
+              this.tempList = data.records
+              this.dataList = this.dataList.concat(this.tempList)
+            }else {
+              this.$message.warn('没有更多数据了!!!')
+            }
             this.loading = false
           }
       )
@@ -77,22 +75,8 @@ export default {
       this.page.current = current
       this.listInfo()
     },
-    // 获取参考线/文档完整的高度
-    getLineHeight() {
-      return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-    },
-    // 获取滚动条当前的位置
-    getScrollHeight() {
-      let scrollTop = 0
-      if (document.documentElement && document.documentElement.scrollTop) {
-        scrollTop = document.documentElement.scrollTop
-      } else if (document.body) {
-        scrollTop = document.body.scrollTop
-      }
-      return scrollTop
-    },
     // 获取当前可视范围的高度
-    getClientHeight() {
+    getWindowHeight() {
       let clientHeight = 0
       if (document.body.clientHeight && document.documentElement.clientHeight) {
         clientHeight = Math.min(document.body.clientHeight, document.documentElement.clientHeight)
@@ -101,21 +85,32 @@ export default {
       }
       return clientHeight
     },
-
-    // 滚动事件触发下拉加载
-    lazyLoad() {
-      if (this.getScrollHeight() - this.getClientHeight() - this.getScrollTop() <= 0) {
-        console.log(11111111111)
-        console.log(this.page)
-        console.log(Math.ceil(this.page.total / this.page.size))
-        console.log(this.allPage)
-        if (this.page.current <= this.allPage) {
-          this.page.current++;
-          console.log(this.page)
-          this.listInfo()
-        } else {
-          this.$message.warn('没有更多内容了！！！');
-        }
+    // 获取滚动条/文档所有的高度
+    getScrollHeight() {
+      return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+    },
+    // 获取滚动条当前的位置,即滚动条距离顶部的距离
+    getScrollTop() {
+      let scrollTop = 0
+      if (document.documentElement && document.documentElement.scrollTop) {
+        scrollTop = document.documentElement.scrollTop
+      } else if (document.body) {
+        scrollTop = document.body.scrollTop
+      }
+      return scrollTop
+    },
+    isRefresh() {
+      //变量scrollTop是滚动条滚动时，距离顶部的距离
+      let scrollTop = this.getScrollTop()
+      //变量windowHeight是可视区的高度
+      let windowHeight = this.getWindowHeight()
+      //变量scrollHeight是滚动条的总高度
+      let scrollHeight = this.getScrollHeight()
+      //滚动条到底部的条件
+      if (scrollTop + windowHeight >= scrollHeight - 200 && this.isRefreshBool&&this.page.current<3) {
+        // false防止加载数据函数多次触发
+        this.isRefreshBool = false;
+        this.listInfo();
       }
     },
     gotoTop() {
