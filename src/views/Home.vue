@@ -9,9 +9,17 @@
         </a-card>
       </a-list-item>
     </a-list>
-    <a-affix :offset-top="120" @change="change">
-      <a-button>返回顶部</a-button>
-    </a-affix>
+    <div v-show="isShowGoTop" :style="{position:'fixed',right:'50px',bottom:'120px'}">
+      <a-tooltip placement="topRight">
+        <template slot="title">
+          <span>返回顶部</span>
+        </template>
+        <a-button type="primary" @click="goTop">
+          <a-icon theme="filled" type="caret-up"/>
+        </a-button>
+      </a-tooltip>
+
+    </div>
   </div>
 </template>
 <script>
@@ -30,7 +38,8 @@ export default {
         fields: '',
         total: 10
       },
-      isRefreshBool: true
+      isRefreshBool: true,
+      isShowGoTop: false
     }
   },
   created() {
@@ -52,14 +61,12 @@ export default {
               return
             }
             const data = res.data.data
-              this.page.total = data.total;
-              this.page.current++
-              this.isRefreshBool = true
+            this.page.total = data.total;
+            this.page.current++
+            this.isRefreshBool = true
             if (data.records) {
               this.tempList = data.records
               this.dataList = this.dataList.concat(this.tempList)
-            }else {
-              this.$message.warn('没有更多数据了!!!')
             }
             this.loading = false
           }
@@ -107,14 +114,21 @@ export default {
       //变量scrollHeight是滚动条的总高度
       let scrollHeight = this.getScrollHeight()
       //滚动条到底部的条件
-      if (scrollTop + windowHeight >= scrollHeight - 200 && this.isRefreshBool&&this.page.current<3) {
-        // false防止加载数据函数多次触发
-        this.isRefreshBool = false;
-        this.listInfo();
+      let yOffset = window.pageYOffset
+      this.isShowGoTop = yOffset > windowHeight;
+      if (scrollTop + windowHeight >= scrollHeight - 200) {
+        if (this.isRefreshBool && this.page.current < 4) {
+          // false防止加载数据函数多次触发
+          this.isRefreshBool = false;
+          this.listInfo();
+        } else {
+          this.$message.warn('没有更多数据了!!!')
+        }
       }
     },
-    gotoTop() {
+    goTop() {
       console.log('回到顶部')
+      // $('body,html').animate({scrollTop:0},1500);
     }
   }
 }
