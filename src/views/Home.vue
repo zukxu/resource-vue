@@ -2,82 +2,63 @@
   <div id="Home">
     <div class="res-nav-header">
       <!--筛选-->
-      <a-card>
-        <template slot="title">
-          <a-icon type="search"/>
-          筛选/搜索
-        </template>
-        <template slot="extra">
-          <a-space>
-            <a-button @click="clearSearch">重置</a-button>
-            <a-button @click="onSearch" type="primary">查询结果</a-button>
-          </a-space>
-        </template>
-        <div class="search-form-body">
-          <a-form :model="page" layout="inline">
-            <a-form-model-item label="输入搜索：">
-              <a-input placeholder="输入资源名称"
-                       v-model="page.fields"
-              />
-            </a-form-model-item>
-            <a-form-model-item label="资源分类：">
-              <a-select
-                  :filter-option="filterOption"
-                  :value="page.index"
-                  @change="searchTypeChange"
-                  allowClear
-                  option-filter-prop="children"
-                  placeholder="请选择分类"
-                  show-search
-                  style="width:200px"
-              >
-                <a-select-option :key="d.value" :value="d.value" v-for="d in typeList">{{d.text}}</a-select-option>
-              </a-select>
-            </a-form-model-item>
-          </a-form>
-        </div>
-      </a-card>
+      <div>
+        <a-input-search
+            v-model="page.fields"
+            allow-clear
+            enter-button="Search"
+            placeholder="输入资源名称"
+            size="large"
+            @search="onSearch"
+        />
+      </div>
     </div>
     <div class="res-index-content-list">
-      <a-list :data-source="dataList" item-layout="vertical" size="large">
-        <div slot="footer"><b>ant design vue</b>资源管理系统</div>
-        <a-list-item key="item.id" slot="renderItem" slot-scope="item,index">
-          <template v-for="{ type, text } in actions" slot="actions">
+      <a-tabs default-active-key="-1" type="card" @change="changeTab">
+        <template v-for="(type) in typeList">
+          <a-tab-pane :key="type.value" :tab="type.text">
+            <a-list :data-source="dataList" item-layout="vertical" size="large">
+              <div slot="footer"><b>ant design vue</b>资源管理系统</div>
+              <a-list-item key="item.id" slot="renderItem" slot-scope="item,index">
+                <template v-for="{ type, text } in actions" slot="actions">
         <span :key="type">
           <a-icon :type="type" style="margin-right: 8px"/>
           {{ text }}
         </span>
-          </template>
-          <img
-              slot="extra"
-              alt="logo"
-              src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-              width="272"
-          />
-          <a-list-item-meta :description="item.remark">
-            <div slot="title" :href="item.content">
-              <a-badge
-                  :count="index + 1"
-                  :number-style="{
+                </template>
+                <img
+                    slot="extra"
+                    alt="logo"
+                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    width="272"
+                />
+                <a-list-item-meta :description="item.remark">
+                  <div slot="title" :href="item.content">
+                    <a-badge
+                        :count="index + 1"
+                        :number-style="{
         backgroundColor: '#FD9999',
         color: '#fff',
         boxShadow: '0 0 0 1px #d9d9d9 inset',
         fontWeight:'bold'
       }"
-              />
-              <b style="margin-left: 5px">{{ item.name }}</b>
-            </div>
-            <a-avatar slot="avatar" :src="avatar"/>
-          </a-list-item-meta>
-          <div style="float: right">
-          <a-icon type="right-circle" />
-          {{ item.typeName }}
-          </div>
-          <a-button >
-          <a :href="item.content" target="_blank">进入</a>
-          </a-button>
-        </a-list-item>
-      </a-list>
+                    />
+                    <b style="margin-left: 5px">{{ item.name }}</b>
+                  </div>
+                  <a-avatar slot="avatar" :src="avatar"/>
+                </a-list-item-meta>
+                <div style="float: right">
+                  <a-icon type="right-circle"/>
+                  {{ item.typeName }}
+                </div>
+                <a-button>
+                  <a :href="item.content" target="_blank">进入</a>
+                </a-button>
+              </a-list-item>
+            </a-list>
+          </a-tab-pane>
+        </template>
+      </a-tabs>
     </div>
     <a-divider>第{{ page.current - 1 }}页/共{{ page.total }}条数据</a-divider>
     <div class="loadMore">
@@ -93,6 +74,7 @@
 </template>
 <script>
 import {listRes} from '@/service/resource'
+import {listType} from '@/service/type'
 
 export default {
   data() {
@@ -100,12 +82,17 @@ export default {
       loading: false,
       dataList: [],
       tempList: [],
+      typeList: [{
+        value: -1,
+        text: '全部'
+      }],
       page: {
         current: 1,
-        size: 20,
+        size: 10,
         index: '',
         fields: '',
-        total: 10
+        total: 10,
+        allPages:10
       },
       hasMore: false,
       actions: [
@@ -118,6 +105,7 @@ export default {
   },
   created() {
     this.listInfo()
+    this.typeInfo()
   },
 
   methods: {
@@ -130,8 +118,9 @@ export default {
             }
             const data = res.data.data
             this.page.total = data.total;
+            this.page.allPages = data.pages;
             this.hasMore = false
-            console.log(data.records)
+            console.log(data)
             if (data.records && data.records.length > 0) {
               this.tempList = data.records
               this.dataList = this.dataList.concat(this.tempList)
@@ -142,13 +131,56 @@ export default {
           }
       )
     },
+    //分类查询
+    typeInfo() {
+      listType().then((res) => {
+        console.log(res)
+        const result = res.data.data
+        result.forEach((r) => {
+          this.typeList.push({
+            value: String(r.id),
+            text: r.typeName
+          })
+        })
+      }).catch(e => {
+        this.$message.error('查询信息失败：' + e)
+      })
+    },
     loadMore() {
+      if (this.page.current-1 === this.page.allPages) {
+        this.hasMore=false
+      }
       if (this.hasMore) {
         this.listInfo();
       } else {
-        this.$message.warn('没有更多数据了!')
+        this.$message.warn('没有更多数据了!');
       }
     },
+    changeTab(key) {
+      console.log(key);
+      this.page.current = 1
+      if (-1 === key) {
+        this.page.index = undefined
+      } else {
+        this.page.index = key
+      }
+      this.dataList = []
+      this.listInfo()
+
+    },
+    onChange() {
+      console.log(111)
+      if (this.page.fields.length <= 0) {
+      console.log(222)
+        this.onSearch()
+      }
+    },
+    onSearch() {
+      //重置查询参数
+      this.page.current = 1
+      this.dataList = []
+      this.listInfo()
+    }
   }
 }
 </script>
@@ -156,9 +188,13 @@ export default {
 #Home {
   padding: 20px;
 
-  .res-index-content-list {
+  .res-nav-header, .res-index-content-list {
     width: 70%;
     margin: 0 auto;
+  }
+
+  .res-index-content-list {
+    margin-top: 20px;
   }
 
 
