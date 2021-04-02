@@ -1,5 +1,6 @@
 import {
     Affix,
+    Avatar,
     Badge,
     BackTop,
     Button,
@@ -34,5 +35,5 @@ import {
 } from 'ant-design-vue'
 import Vue from 'vue'
 
-Vue.use(Affix).use(BackTop).use(Badge).use(Descriptions).use(Dropdown).use(Drawer).use(InputNumber).use(Tree).use(Result).use(Upload).use(select).use(space).use(Button).use(Layout).use(Menu).use(Icon).use(Select).use(Row).use(Col).use(Form).use(FormModel).use(Input).use(Table).use(Tag).use(Divider).use(Pagination).use(Tooltip).use(Popconfirm).use(List).use(Card).use(Modal).use(ConfigProvider)
+Vue.use(Affix).use(Avatar).use(BackTop).use(Badge).use(Descriptions).use(Dropdown).use(Drawer).use(InputNumber).use(Tree).use(Result).use(Upload).use(select).use(space).use(Button).use(Layout).use(Menu).use(Icon).use(Select).use(Row).use(Col).use(Form).use(FormModel).use(Input).use(Table).use(Tag).use(Divider).use(Pagination).use(Tooltip).use(Popconfirm).use(List).use(Card).use(Modal).use(ConfigProvider)
 

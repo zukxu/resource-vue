@@ -1,14 +1,42 @@
 <template>
-  <div id="Home" ref="container">
-    <a-list :data-source="dataList" :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3 }">
-      <a-list-item slot="renderItem" slot-scope="item, index">
-        <a-card :key="index" :title="item.name">
-          <span style="color: red">{{ index + 1 }}</span>
+  <div id="Home">
+    <div class="res-nav-header">头部</div>
+    <div class="res-index-content-list">
+      <a-list :data-source="dataList" item-layout="vertical" size="large">
+        <div slot="footer"><b>ant design vue</b>资源管理系统</div>
+        <a-list-item key="item.id" slot="renderItem" slot-scope="item,index">
+          <template v-for="{ type, text } in actions" slot="actions">
+        <span :key="type">
+          <a-icon :type="type" style="margin-right: 8px"/>
+          {{ text }}
+        </span>
+          </template>
+          <img
+              slot="extra"
+              alt="logo"
+              src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+              width="272"
+          />
+          <a-list-item-meta :description="item.remark">
+            <div slot="title" :href="item.content">
+              <a-badge
+                  :count="index + 1"
+                  :number-style="{
+        backgroundColor: '#FD9999',
+        color: '#fff',
+        boxShadow: '0 0 0 1px #d9d9d9 inset',
+        fontWeight:'bold'
+      }"
+              />
+              <b style="margin-left: 5px">{{ item.name }}</b>
+            </div>
+            <a-avatar slot="avatar" :src="avatar"/>
+          </a-list-item-meta>
           {{ item.content }}
-          {{ item.remark }}
-        </a-card>
-      </a-list-item>
-    </a-list>
+          <a-button>进入</a-button>
+        </a-list-item>
+      </a-list>
+    </div>
     <a-divider>第{{ page.current - 1 }}页/共{{ page.total }}条数据</a-divider>
     <div class="loadMore">
       <a-button type="primary" @click="loadMore">
@@ -37,7 +65,13 @@ export default {
         fields: '',
         total: 10
       },
-      hasMore: false
+      hasMore: false,
+      actions: [
+        {type: 'star-o', text: '156'},
+        {type: 'like-o', text: '156'},
+        {type: 'message', text: '2'},
+      ],
+      avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
     }
   },
   created() {
@@ -55,6 +89,7 @@ export default {
             const data = res.data.data
             this.page.total = data.total;
             this.hasMore = false
+            console.log(data.records)
             if (data.records && data.records.length > 0) {
               this.tempList = data.records
               this.dataList = this.dataList.concat(this.tempList)
@@ -79,13 +114,15 @@ export default {
 #Home {
   padding: 20px;
 
-  .pagination-local {
-    left: 25%;
-    top: 35px;
+  .res-index-content-list {
+    width: 70%;
+    margin: 0 auto;
   }
+
 
   .loadMore {
     text-align: center;
   }
+
 }
 </style>
