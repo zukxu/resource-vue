@@ -74,6 +74,7 @@
 import {listRes} from '@/service/resource'
 import {listType} from '@/service/type'
 import request from '@/utils/request'
+
 export default {
   data() {
     return {

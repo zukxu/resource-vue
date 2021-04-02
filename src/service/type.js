@@ -34,3 +34,7 @@ export function updType(entity) {
   type.updType.data = entity
   return request(type.updType)
 }
+// 统计
+export function countType() {
+  return request(type.countType)
+}

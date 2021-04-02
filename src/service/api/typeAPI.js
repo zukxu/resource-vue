@@ -34,6 +34,12 @@ const TYPE_API = {
     method: 'delete',
     url: '/type',
     params: ''
+  },
+  //统计分类
+  countType: {
+    method: 'get',
+    url: '/type/countType',
+    params: ''
   }
 }
 export default TYPE_API
