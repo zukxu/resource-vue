@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="res-index-content-list">
-      <a-tabs default-active-key="-1" type="card" @change="changeTab">
+      <a-tabs default-active-key="-1" @change="changeTab">
         <template v-for="(type) in typeList">
           <a-tab-pane :key="type.value" :tab="type.text">
             <a-list :data-source="dataList" item-layout="vertical" size="large">
@@ -37,11 +37,11 @@
                     <a-badge
                         :count="index + 1"
                         :number-style="{
-        backgroundColor: '#FD9999',
-        color: '#fff',
-        boxShadow: '0 0 0 1px #d9d9d9 inset',
-        fontWeight:'bold'
-      }"
+                        backgroundColor: '#FD9999',
+                        color: '#fff',
+                        boxShadow: '0 0 0 1px #d9d9d9 inset',
+                        fontWeight:'bold'
+                      }"
                     />
                     <b style="margin-left: 5px">{{ item.name }}</b>
                   </div>
@@ -51,9 +51,7 @@
                   <a-icon type="right-circle"/>
                   {{ item.typeName }}
                 </div>
-                <a-button>
-                  <a :href="item.content" target="_blank">进入</a>
-                </a-button>
+                <a-button type="link" @click="openLink(item.content)">进入</a-button>
               </a-list-item>
             </a-list>
           </a-tab-pane>
@@ -75,7 +73,7 @@
 <script>
 import {listRes} from '@/service/resource'
 import {listType} from '@/service/type'
-
+import request from '@/utils/request'
 export default {
   data() {
     return {
@@ -92,7 +90,7 @@ export default {
         index: '',
         fields: '',
         total: 10,
-        allPages:10
+        allPages: 10
       },
       hasMore: false,
       actions: [
@@ -147,8 +145,8 @@ export default {
       })
     },
     loadMore() {
-      if (this.page.current-1 === this.page.allPages) {
-        this.hasMore=false
+      if (this.page.current - 1 === this.page.allPages) {
+        this.hasMore = false
       }
       if (this.hasMore) {
         this.listInfo();
@@ -171,7 +169,7 @@ export default {
     onChange() {
       console.log(111)
       if (this.page.fields.length <= 0) {
-      console.log(222)
+        console.log(222)
         this.onSearch()
       }
     },
@@ -180,7 +178,31 @@ export default {
       this.page.current = 1
       this.dataList = []
       this.listInfo()
-    }
+    },
+    openLink(url) {
+      let pattern = new RegExp('(http|https)')
+      let word = new RegExp('[\u4e00-\u9fa5]')
+      let w = word.test(url)
+      if (w) {
+        this.$message.warn('这不是链接')
+        return
+      }
+      let test = pattern.test(url)
+      const http = 'http://'
+      const https = 'https://'
+      if (test) {
+        window.open(url, '_blank')
+      } else {
+        request({
+          method: 'get',
+          url: http + url,
+        }).then((res) => {
+          window.open(http + url, '_blank')
+        }).catch(e => {
+          window.open(https + url, '_blank')
+        })
+      }
+    },
   }
 }
 </script>
