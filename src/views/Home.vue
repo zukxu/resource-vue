@@ -1,6 +1,43 @@
 <template>
   <div id="Home">
-    <div class="res-nav-header">头部</div>
+    <div class="res-nav-header">
+      <!--筛选-->
+      <a-card>
+        <template slot="title">
+          <a-icon type="search"/>
+          筛选/搜索
+        </template>
+        <template slot="extra">
+          <a-space>
+            <a-button @click="clearSearch">重置</a-button>
+            <a-button @click="onSearch" type="primary">查询结果</a-button>
+          </a-space>
+        </template>
+        <div class="search-form-body">
+          <a-form :model="page" layout="inline">
+            <a-form-model-item label="输入搜索：">
+              <a-input placeholder="输入资源名称"
+                       v-model="page.fields"
+              />
+            </a-form-model-item>
+            <a-form-model-item label="资源分类：">
+              <a-select
+                  :filter-option="filterOption"
+                  :value="page.index"
+                  @change="searchTypeChange"
+                  allowClear
+                  option-filter-prop="children"
+                  placeholder="请选择分类"
+                  show-search
+                  style="width:200px"
+              >
+                <a-select-option :key="d.value" :value="d.value" v-for="d in typeList">{{d.text}}</a-select-option>
+              </a-select>
+            </a-form-model-item>
+          </a-form>
+        </div>
+      </a-card>
+    </div>
     <div class="res-index-content-list">
       <a-list :data-source="dataList" item-layout="vertical" size="large">
         <div slot="footer"><b>ant design vue</b>资源管理系统</div>
@@ -32,8 +69,13 @@
             </div>
             <a-avatar slot="avatar" :src="avatar"/>
           </a-list-item-meta>
-          {{ item.content }}
-          <a-button>进入</a-button>
+          <div style="float: right">
+          <a-icon type="right-circle" />
+          {{ item.typeName }}
+          </div>
+          <a-button >
+          <a :href="item.content" target="_blank">进入</a>
+          </a-button>
         </a-list-item>
       </a-list>
     </div>
